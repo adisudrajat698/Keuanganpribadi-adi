@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Keuangan Pribadi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@tailwindcss/browser@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* Gaya CSS Kustom (jika diperlukan) */
+        .transaksi-positif {
+            color: #16a34a; /* Tailwind green-600 */
+        }
+        .transaksi-negatif {
+            color: #dc2626; /* Tailwind red-600 */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        .detail-transaksi {
+            background-color: #e0f2fe; /* Tailwind blue-100 */
+            padding: 16px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            border: 1px solid #b0e0fe; /* Tailwind blue-200 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-inter">
+    <div class="container mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
+        <h1 class="text-3xl font-semibold text-center text-blue-600 mb-8">Aplikasi Keuangan Pribadi</h1>
+
+        <div id="section-login" class="bg-gray-100 rounded-lg p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Login</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="username" class="block text-gray-700 text-sm font-bold mb-2">Username:</label>
+                    <input type="text" id="username" placeholder="Masukkan username" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+                </div>
+                <div>
+                    <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password:</label>
+                    <input type="password" id="password" placeholder="Masukkan password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+                </div>
+            </div>
+            <div class="mt-6">
+                <button id="login-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Login
+                </button>
+            </div>
+            <div id="error-message" class="text-red-500 text-xs italic mt-4" style="display: none;"></div>
+        </div>
+
+        <div id="section-logout" class="bg-gray-100 rounded-lg p-6 mb-8" style="display: none;">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Logout</h2>
+            <p class="text-gray-800 mb-4">Anda telah login. Klik tombol di bawah untuk logout.</p>
+            <button id="logout-button" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Logout
+            </button>
+        </div>
+
+        <div id="section-saldo" class="bg-indigo-100 rounded-lg p-4 mb-6" style="display: none;">
+            <h2 class="text-xl font-semibold text-indigo-700 mb-2">Saldo Anda</h2>
+            <p id="total-saldo" class="text-2xl font-bold text-gray-800">Rp 0</p>
+        </div>
+
+        <div id="section-tambah-transaksi" class="bg-yellow-100 rounded-lg p-6 mb-8" style="display: none;">
+            <h2 class="text-2xl font-semibold text-yellow-700 mb-4">Tambah Transaksi</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <label for="tanggal" class="block text-gray-700 text-sm font-bold mb-2">Tanggal:</label>
+                <input type="date" id="tanggal" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+
+                <label for="jenis" class="block text-gray-700 text-sm font-bold mb-2">Jenis:</label>
+                <select id="jenis" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    <option value="pendapatan">Pendapatan</option>
+                    <option value="pengeluaran">Pengeluaran</option>
+                </select>
+
+                <label for="kategori" class="block text-gray-700 text-sm font-bold mb-2">Kategori:</label>
+                <input type="text" id="kategori" placeholder="Makanan, Transport..." class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+
+                <label for="jumlah" class="block text-gray-700 text-sm font-bold mb-2">Jumlah:</label>
+                <input type="number" id="jumlah" placeholder="Masukkan jumlah" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+            </div>
+            <div class="mt-6">
+                <button id="tambah-transaksi" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Tambah Transaksi
+                </button>
+            </div>
+        </div>
+
+        <div id="section-filter-transaksi" class="bg-purple-100 rounded-lg p-6 mb-8" style="display: none;">
+            <h2 class="text-2xl font-semibold text-purple-700 mb-4">Filter Transaksi</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label for="filter-bulan" class="block text-gray-700 text-sm font-bold mb-2">Filter Bulan:</label>
+                    <select id="filter-bulan" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="">Semua Bulan</option>
+                        <option value="0">Januari</option>
+                        <option value="1">Februari</option>
+                        <option value="2">Maret</option>
+                        <option value="3">April</option>
+                        <option value="4">Mei</option>
+                        <option value="5">Juni</option>
+                        <option value="6">Juli</option>
+                        <option value="7">Agustus</option>
+                        <option value="8">September</option>
+                        <option value="9">Oktober</option>
+                        <option value="10">November</option>
+                        <option value="11">Desember</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="filter-tahun" class="block text-gray-700 text-sm font-bold mb-2">Filter Tahun:</label>
+                    <select id="filter-tahun" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="">Semua Tahun</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="filter-kategori" class="block text-gray-700 text-sm font-bold mb-2">Filter Kategori:</label>
+                    <input type="text" id="filter-kategori" placeholder="Cari Kategori" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+                </div>
+            </div>
+        </div>
+
+        <div id="section-daftar-transaksi" class="bg-green-100 rounded-lg p-6 mb-8" style="display: none;">
+            <h2 class="text-2xl font-semibold text-green-700 mb-4">Daftar Transaksi</h2>
+            <div class="overflow-x-auto">
+                <table id="daftar-transaksi" class="min-w-full leading-normal shadow-md rounded-lg overflow-hidden">
+                    <thead class="bg-gray-200 text-gray-700">
+                        <tr>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Tanggal</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Jenis</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Kategori</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 text-right text-xs font-semibold uppercase tracking-wider">Jumlah</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white">
+                        <tr>
+                            <td colspan="5" class="px-5 py-5 border-b border-gray-200 text-sm">Tidak ada transaksi.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="detail-transaksi" class="mt-4 detail-transaksi" style="display: none;">
+                <h3 class="text-lg font-semibold text-blue-700 mb-2">Detail Transaksi</h3>
+                <p><strong>Tanggal:</strong> <span id="detail-tanggal"></span></p>
+                <p><strong>Jenis:</strong> <span id="detail-jenis"></span></p>
+                <p><strong>Kategori:</strong> <span id="detail-kategori"></span></p>
+                <p><strong>Jumlah:</strong> <span id="detail-jumlah"></span></p>
+                <button id="hapus-transaksi" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4">
+                    Hapus Transaksi
+                </button>
+            </div>
+        </div>
+
+        <div id="section-summary" class="bg-red-100 rounded-lg p-6 mb-8" style="display: none;">
+            <h2 class="text-2xl font-semibold text-red-700 mb-4">Ringkasan</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700">Total Pendapatan:</h3>
+                    <p id="total-pendapatan" class="text-xl font-bold text-green-600">Rp 0</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700">Total Pengeluaran:</h3>
+                    <p id="total-pengeluaran" class="text-xl font-bold text-red-600">Rp 0</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700">Saldo Akhir:</h3>
+                    <p id="saldo-akhir" class="text-xl font-bold text-blue-600">Rp 0</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-6" style="display: none;">
+            <button id="cetak-pdf" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Cetak PDF
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Data transaksi (sementara, akan disimpan di localStorage setelah login)
+        let transaksi = [];
+        let isLoggedIn = false;
+        let username = "";
+        let selectedTransaksiId = null;
+
+        // Mendapatkan elemen-elemen HTML
+        const loginButton = document.getElementById('login-button');
+        const logoutButton = document.getElementById('logout-button');
+        const loginSection = document.getElementById('section-login');
+        const logoutSection = document.getElementById('section-logout');
+        const saldoSection = document.getElementById('section-saldo');
+        const tambahTransaksiSection = document.getElementById('section-tambah-transaksi');
+        const filterTransaksiSection = document.getElementById('section-filter-transaksi');
+        const daftarTransaksiTable = document.getElementById('daftar-transaksi');
+        const summarySection = document.getElementById('section-summary');
+        const cetakPdfButton = document.getElementById('cetak-pdf');
+
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const errorMessage = document.getElementById('error-message');
+
+        const tanggalInput = document.getElementById('tanggal');
+        const jenisInput = document.getElementById('jenis');
+        const kategoriInput = document.getElementById('kategori');
+        const jumlahInput = document.getElementById('jumlah');
+        const tambahTransaksiButton = document.getElementById('tambah-transaksi');
+
+        const totalSaldoElement = document.getElementById('total-saldo');
+        const totalPendapatanElement = document.getElementById('total-pendapatan');
+        const totalPengeluaranElement = document.getElementById('total-pengeluaran');
+        const saldoAkhirElement = document.getElementById('saldo-akhir');
+
+        const filterBulanInput = document.getElementById('filter-bulan');
+        const filterTahunInput = document.getElementById('filter-tahun');
+        const filterKategoriInput = document.getElementById('filter-kategori');
+
+        const detailTransaksiDiv = document.getElementById('detail-transaksi');
+        const detailTanggalElement = document.getElementById('detail-tanggal');
+        const detailJenisElement = document.getElementById('detail-jenis');
+        const detailKategoriElement = document.getElementById('detail-kategori');
+        const detailJumlahElement = document.getElementById('detail-jumlah');
+        const hapusTransaksiButton = document.getElementById('hapus-transaksi');
+
+        // Fungsi untuk menampilkan atau menyembunyikan bagian-bagian aplikasi
+        function toggleSections() {
+            if (isLoggedIn) {
+                loginSection.style.display = 'none';
+                logoutSection.style.display = 'block';
+                saldoSection.style.display = 'block';
+                tambahTransaksiSection.style.display = 'block';
+                filterTransaksiSection.style.display = 'block';
+                daftarTransaksiTable.parentElement.parentElement.style.display = 'block'; 
+                summarySection.style.display = 'block';
+                cetakPdfButton.parentElement.style.display = 'block';
+            } else {
+                loginSection.style.display = 'block';
+                logoutSection.style.display = 'none';
+                saldoSection.style.display = 'none';
+                tambahTransaksiSection.style.display = 'none';
+                filterTransaksiSection.style.display = 'none';
+                daftarTransaksiTable.parentElement.parentElement.style.display = 'none'; 
+                summarySection.style.display = 'none';
+                cetakPdfButton.parentElement.style.display = 'none';
+            }
+        }
+
+        // Event listener untuk tombol login
+        loginButton.addEventListener('click', () => {
+            const enteredUsername = usernameInput.value;
+            const enteredPassword = passwordInput.value;
+
+            if (enteredUsername === 'adi' && enteredPassword === 'adi') {
+                isLoggedIn = true;
+                username = enteredUsername;
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('username', username);
+                // Load transaksi from localStorage
+                const storedTransaksi = localStorage.getItem('transaksi-' + username);
+                if (storedTransaksi) {
+                    transaksi = JSON.parse(storedTransaksi);
+                }
+                toggleSections();
+                renderTransaksi();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Anda berhasil login.',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+            } else {
+                errorMessage.textContent = 'Username atau password salah.';
+                errorMessage.style.display = 'block';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: 'Username atau password salah.',
+                });
+            }
+            usernameInput.value = '';
+            passwordInput.value = '';
+        });
+
+        // Event listener untuk tombol logout
+        logoutButton.addEventListener('click', () => {
+            isLoggedIn = false;
+            username = "";
+            localStorage.setItem('isLoggedIn', 'false');
+            localStorage.removeItem('username');
+             // Clear transaksi from localStorage
+            localStorage.removeItem('transaksi-' + username);
+            transaksi = [];
+            toggleSections();
+            renderTransaksi();
+            Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Anda berhasil logout.',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+        });
+
+        // Fungsi untuk menambahkan transaksi baru
+        function tambahTransaksi() {
+            const tanggal = tanggalInput.value;
+            const jenis = jenisInput.value;
+            const kategori = kategoriInput.value;
+            const jumlah = parseFloat(jumlahInput.value);
+
+            if (!tanggal || !jenis || !kategori || isNaN(jumlah)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Harap isi semua field dengan benar.',
+                });
+                return;
+            }
+
+            const transaksiBaru = {
+                id: Date.now(), // Tambahkan ID unik
+                tanggal,
+                jenis,
+                kategori,
+                jumlah,
+                timestamp: new Date().getTime()
+            };
+
+            transaksi.push(transaksiBaru);
+            localStorage.setItem('transaksi-' + username, JSON.stringify(transaksi)); // Save transaksi
+
+            tanggalInput.value = '';
+            jenisInput.value = 'pendapatan';
+            kategoriInput.value = '';
+            jumlahInput.value = '';
+
+            renderTransaksi();
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Transaksi Anda telah ditambahkan.',
+                timer: 1500,
+                showConfirmButton: false,
+            });
+        }
+
+        // Fungsi untuk menampilkan detail transaksi
+        function tampilkanDetailTransaksi(id) {
+            const transaksiDetail = transaksi.find(t => t.id === id);
+            if (transaksiDetail) {
+                selectedTransaksiId = id;
+                const tanggalFormatted = new Date(transaksiDetail.tanggal).toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+                detailTanggalElement.textContent = tanggalFormatted;
+                detailJenisElement.textContent = transaksiDetail.jenis;
+                detailKategoriElement.textContent = transaksiDetail.kategori;
+                detailJumlahElement.textContent = `Rp ${transaksiDetail.jumlah.toLocaleString('id-ID')}`;
+                detailTransaksiDiv.style.display = 'block';
+            } else {
+                detailTransaksiDiv.style.display = 'none';
+            }
+        }
+
+        // Event listener untuk tombol hapus transaksi
+        hapusTransaksiButton.addEventListener('click', () => {
+            if (selectedTransaksiId !== null) {
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Transaksi ini akan dihapus permanen!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        transaksi = transaksi.filter(t => t.id !== selectedTransaksiId);
+                        localStorage.setItem('transaksi-' + username, JSON.stringify(transaksi)); // Update transaksi
+                        renderTransaksi();
+                        detailTransaksiDiv.style.display = 'none';
+                        Swal.fire(
+                            'Terhapus!',
+                            'Transaksi Anda telah dihapus.',
+                            'success'
+                        );
+                    }
+                });
+            }
+        });
+
+        // Fungsi untuk menampilkan daftar transaksi
+        function renderTransaksi() {
+            const transaksiListBody = daftarTransaksiTable.querySelector('tbody');
+            transaksiListBody.innerHTML = '';
+
+            const filterBulan = filterBulanInput.value;
+            const filterTahun = filterTahunInput.value;
+            const filterKategori = filterKategoriInput.value.toLowerCase();
+
+            let totalPendapatan = 0;
+            let totalPengeluaran = 0;
+            let saldoAkhir = 0;
+
+            const transaksiYangDifilter = transaksi.filter(transaksi => {
+                const tanggalTransaksi = new Date(transaksi.tanggal);
+                const bulanTransaksi = tanggalTransaksi.getMonth().toString();
+                const tahunTransaksi = tanggalTransaksi.getFullYear().toString();
+                const kategoriTransaksi = transaksi.kategori.toLowerCase();
+
+                const cocokBulan = !filterBulan || bulanTransaksi === filterBulan;
+                const cocokTahun = !filterTahun || tahunTransaksi === tahunTransaksi;
+                const cocokKategori = !filterKategori || kategoriTransaksi.includes(filterKategori);
+
+                return cocokBulan && cocokTahun && cocokKategori;
+            }).sort((a, b) => {
+                // Urutkan berdasarkan timestamp, transaksi terbaru di atas
+                return new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime();
+            });
+
+            if (transaksiYangDifilter.length === 0) {
+                transaksiListBody.innerHTML = `<tr><td colspan="5" class="px-5 py-5 border-b border-gray-200 text-sm text-gray-500">Tidak ada transaksi yang sesuai dengan filter.</td></tr>`;
+            } else {
+                transaksiYangDifilter.forEach(transaksi => {
+                    const row = document.createElement('tr');
+                    const tanggalFormatted = new Date(transaksi.tanggal).toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+
+                    row.innerHTML = `
+                        <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="font-italic text-gray-800">${tanggalFormatted}</span></td>
+                        <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="font-semibold ${transaksi.jenis === 'pendapatan' ? 'transaksi-positif' : 'transaksi-negatif'}">${transaksi.jenis}</span></td>
+                        <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="font-oblique font-sans text-purple-600">${transaksi.kategori}</span></td>
+                        <td class="px-5 py-5 border-b border-gray-200 text-sm text-right">Rp ${transaksi.jumlah.toLocaleString('id-ID')}</td>
+                        <td class="px-5 py-5 border-b border-gray-200 text-sm">
+                            <button class="lihat-detail bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline text-xs" data-id="${transaksi.id}">
+                                Detail
+                            </button>
+                        </td>
+                    `;
+                    transaksiListBody.appendChild(row);
+
+                    if (transaksi.jenis === 'pendapatan') {
+                        totalPendapatan += transaksi.jumlah;
+                    } else {
+totalPengeluaran += transaksi.jumlah;
+                    }
+                });
+
+                // Tambahkan event listener untuk tombol "Detail" setelah ditambahkan ke DOM
+                const detailButtons = daftarTransaksiTable.querySelectorAll('.lihat-detail');
+                detailButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const id = parseInt(button.getAttribute('data-id'));
+                        tampilkanDetailTransaksi(id);
+                    });
+                });
+            }
+
+            saldoAkhir = totalPendapatan - totalPengeluaran;
+
+            totalSaldoElement.textContent = `Rp ${saldoAkhir.toLocaleString('id-ID')}`;
+            totalPendapatanElement.textContent = `Rp ${totalPendapatan.toLocaleString('id-ID')}`;
+            totalPengeluaranElement.textContent = `Rp ${totalPengeluaran.toLocaleString('id-ID')}`;
+            saldoAkhirElement.textContent = `Rp ${saldoAkhir.toLocaleString('id-ID')}`;
+        }
+
+        // Fungsi untuk mencetak laporan dalam format PDF
+        function cetakPDF() {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+            const title = 'Laporan Keuangan Pribadi';
+            const margin = 15;
+            let y = 20;
+
+            pdf.setFontSize(18);
+            pdf.text(title, pdf.internal.pageSize.getWidth() / 2, y, { align: 'center' });
+            y += 20;
+
+            pdf.setFontSize(14);
+            pdf.text('Saldo Anda:', margin, y);
+            pdf.setFontSize(16);
+            pdf.text(totalSaldoElement.textContent, margin + 40, y);
+            y += 10;
+            pdf.line(margin, y, pdf.internal.pageSize.getWidth() - margin, y);
+            y += 15;
+
+            pdf.setFontSize(14);
+            pdf.text('Ringkasan:', margin, y);
+            y += 10;
+            pdf.setFontSize(12);
+            pdf.text(`Total Pendapatan: ${totalPendapatanElement.textContent}`, margin + 10, y);
+            y += 8;
+            pdf.text(`Total Pengeluaran: ${totalPengeluaranElement.textContent}`, margin + 10, y);
+            y += 8;
+            pdf.text(`Saldo Akhir: ${saldoAkhirElement.textContent}`, margin + 10, y);
+            y += 15;
+
+            pdf.setFontSize(14);
+            pdf.text('Daftar Transaksi:', margin, y);
+            y += 10;
+
+            // Membuat tabel dalam PDF
+            const tableData = [];
+            const headers = ['Tanggal', 'Jenis', 'Kategori', 'Jumlah'];
+            const transaksiYangDifilter = transaksi.filter(transaksi => {
+                const tanggalTransaksi = new Date(transaksi.tanggal);
+                const bulanTransaksi = tanggalTransaksi.getMonth().toString();
+                const tahunTransaksi = tanggalTransaksi.getFullYear().toString();
+                const kategoriTransaksi = transaksi.kategori.toLowerCase();
+                const filterBulan = filterBulanInput.value;
+                const filterTahun = filterTahunInput.value;
+                const filterKategori = filterKategoriInput.value.toLowerCase();
+
+                const cocokBulan = !filterBulan || bulanTransaksi === filterBulan;
+                const cocokTahun = !filterTahun || tahunTransaksi === tahunTransaksi;
+                const cocokKategori = !filterKategori || kategoriTransaksi.includes(filterKategori);
+
+                return cocokBulan && cocokTahun && cocokKategori;
+            }).sort((a, b) =>  new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime());
+
+            transaksiYangDifilter.forEach(transaksi => {
+                 const tanggalFormatted = new Date(transaksi.tanggal).toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+                tableData.push([
+                    tanggalFormatted,
+                    transaksi.jenis,
+                    transaksi.kategori,
+                    `Rp ${transaksi.jumlah.toLocaleString('id-ID')}`
+                ]);
+            });
+
+            // Menghitung lebar kolom otomatis
+            const columnWidths = [40, 30, 40, 40]; // Lebar kolom default
+
+            // Fungsi untuk menambahkan tabel ke PDF
+            function addTableToPDF(data, title) {
+                let startY = y;
+
+                // Header Tabel
+                pdf.setFontSize(10);
+                pdf.setTextColor(100);
+                pdf.setFillColor(240, 240, 240);
+                let x = margin;
+                headers.forEach((header, index) => {
+                    pdf.rect(x, startY, columnWidths[index], 7, 'F');
+                    pdf.text(header, x + 2, startY + 5);
+                    x += columnWidths[index];
+                });
+                startY += 7;
+
+                pdf.setTextColor(0);
+
+                // Data Tabel
+                pdf.setFontSize(10);
+                data.forEach(row => {
+                    x = margin;
+                    row.forEach((cell, index) => {
+                        pdf.text(cell, x + 2, startY + 5);
+                        x += columnWidths[index];
+                    });
+                    startY += 5;
+                });
+                y = startY + 10;
+            }
+            if(transaksiYangDifilter.length > 0){
+                 addTableToPDF(tableData, "Daftar Transaksi");
+            }
+            else{
+                pdf.setFontSize(10);
+                pdf.text("Tidak ada transaksi yang sesuai dengan filter.", margin, y + 5);
+            }
+           
+            pdf.save('laporan-keuangan.pdf');
+        }
+
+        // Inisialisasi aplikasi
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            isLoggedIn = true;
+            username = localStorage.getItem('username');
+             const storedTransaksi = localStorage.getItem('transaksi-' + username);
+            if (storedTransaksi) {
+                transaksi = JSON.parse(storedTransaksi);
+            }
+            toggleSections();
+            renderTransaksi();
+        } else {
+            toggleSections();
+        }
+
+        // Event listeners
+        tambahTransaksiButton.addEventListener('click', tambahTransaksi);
+        filterBulanInput.addEventListener('change', renderTransaksi);
+        filterTahunInput.addEventListener('change', renderTransaksi);
+        filterKategoriInput.addEventListener('input', renderTransaksi);
+        cetPdfButton.addEventListener('click', cetakPDF);
+    </script>
+</body>
+</html>
