@@ -76,7 +76,7 @@
 <body class="bg-gray-100 font-inter">
     <div class="container mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
         <h1 class="text-3xl font-semibold text-center text-blue-600 mb-8">Aplikasi CADAS</h1>
-<h3 class="text-3xl font-semibold text-center text-blue-600 mb-8">Aplikasi Catat Dut Adi Sudrajat</h3>
+<h3 class="text-3xl font-semibold text-center text-blue-600 mb-8">Aplikasi Catat Duit Adi Sudrajat</h3>
 
         <div id="section-login" class="bg-gray-100 rounded-lg p-6 mb-8">
             <h2 class="text-2xl font-semibold text-gray-700 mb-4">login</h2>
@@ -315,7 +315,7 @@
                 Swal.fire({
                     icon: 'success',
                     title: 'Berhasil!',
-                    text: 'Anda berhasil login.', 
+                    text: 'Anda berhasil login.',
                     timer: 1500,
                     showConfirmButton: false,
                 });
@@ -667,13 +667,11 @@
         filterKategoriInput.addEventListener('input', renderTransaksi);
         cetPdfButton.addEventListener('click', cetakLaporan);
     </script>
-    <!-- Simple-DataTables CSS & JS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" />
 <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" defer></script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Cek apakah user login dan tabel ditampilkan
         const daftarTransaksiSection = document.getElementById("section-daftar-transaksi");
         const daftarTransaksiTable = document.getElementById("daftar-transaksi");
 
