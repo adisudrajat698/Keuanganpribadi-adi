@@ -660,7 +660,66 @@
         filterBulanInput.addEventListener('change', renderTransaksi);
         filterTahunInput.addEventListener('change', renderTransaksi);
         filterKategoriInput.addEventListener('input', renderTransaksi);
-        cetPdfButton.addEventListener('click', cetakLaporan);
+        document.getElementById('cetak-pdf').addEventListener('click', () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    let y = 10;
+
+    doc.setFontSize(14);
+    doc.text('Laporan Keuangan Pribadi', 105, y, { align: 'center' });
+    y += 10;
+
+    const transaksiYangDifilter = transaksi.filter(transaksi => {
+        const tanggalTransaksi = new Date(transaksi.tanggal);
+        const bulanTransaksi = tanggalTransaksi.getMonth().toString();
+        const tahunTransaksi = tanggalTransaksi.getFullYear().toString();
+        const kategoriTransaksi = transaksi.kategori.toLowerCase();
+        const filterBulan = filterBulanInput.value;
+        const filterTahun = filterTahunInput.value;
+        const filterKategori = filterKategoriInput.value.toLowerCase();
+
+        const cocokBulan = !filterBulan || bulanTransaksi === filterBulan;
+        const cocokTahun = !filterTahun || tahunTransaksi === filterTahun;
+        const cocokKategori = !filterKategori || kategoriTransaksi.includes(filterKategori);
+
+        return cocokBulan && cocokTahun && cocokKategori;
+    });
+
+    if (transaksiYangDifilter.length === 0) {
+        Swal.fire({
+            icon: 'info',
+            title: 'Tidak Ada Data',
+            text: 'Tidak ada transaksi yang cocok untuk dicetak.',
+        });
+        return;
+    }
+
+    doc.setFontSize(10);
+    doc.text('Tanggal       | Jenis         | Kategori         | Jumlah', 10, y += 10);
+    doc.setDrawColor(0);
+    doc.line(10, y + 2, 200, y + 2);
+
+    transaksiYangDifilter.forEach(t => {
+        const tanggal = new Date(t.tanggal).toLocaleDateString('id-ID');
+        const row = `${tanggal.padEnd(14)}| ${t.jenis.padEnd(13)}| ${t.kategori.padEnd(17)}| Rp ${t.jumlah.toLocaleString('id-ID')}`;
+        y += 8;
+        if (y > 270) {
+            doc.addPage();
+            y = 10;
+        }
+        doc.text(row, 10, y);
+    });
+
+    y += 10;
+    doc.setFontSize(12);
+    doc.text(`Total Pendapatan: ${totalPendapatanElement.textContent}`, 10, y += 10);
+    doc.text(`Total Pengeluaran: ${totalPengeluaranElement.textContent}`, 10, y += 10);
+    doc.text(`Saldo Akhir: ${saldoAkhirElement.textContent}`, 10, y += 10);
+
+    doc.save(`laporan-keuangan-${Date.now()}.pdf`);
+});
+
 
         document.getElementById('export-excel').addEventListener('click', () => {
     const transaksiYangDifilter = transaksi.filter(transaksi => {
