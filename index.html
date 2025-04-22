@@ -8,6 +8,7 @@
     <script src="https://unpkg.com/@tailwindcss/browser@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         /* Gaya CSS Kustom (jika diperlukan) */
         .transaksi-positif {
@@ -29,6 +30,19 @@
         }
         th {
             background-color: #f0f0f0;
+             /* Tambahkan animasi hover pada th */
+            transition: background-color 0.3s ease;
+        }
+        th:hover {
+            background-color: #e0e0e0; /* Warna latar belakang saat dihover */
+        }
+
+        td {
+             /* Tambahkan animasi hover pada td */
+            transition: background-color 0.3s ease;
+        }
+        td:hover {
+            background-color: #f8f8f8;
         }
         .detail-transaksi {
             background-color: #e0f2fe; /* Tailwind blue-100 */
@@ -71,15 +85,46 @@
                 margin-top: 10px;
             }
         }
+
+        /* Animasi untuk tombol */
+        .animated-button {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Animasi untuk elemen yang muncul */
+        .fade-in {
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .icon-animation {
+            animation: spin 2s linear infinite;
+            display: inline-block; /* Memastikan ikon diperlakukan seperti elemen inline */
+        }
+
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+
     </style>
 </head>
 <body class="bg-gray-100 font-inter">
-    <div class="container mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
-       <h1 class="text-4xl font-bold text-center text-indigo-700 mb-2">💸 Aplikasi CADAS</h1>
-<h3 class="text-xl font-medium text-center text-gray-600 mb-8">Catat Duit Adi Sudrajat</h3>
+    <div class="container mx-auto p-6 bg-white rounded-lg shadow-md mt-10 fade-in">
+       <h1 class="text-4xl font-bold text-center text-indigo-700 mb-2 icon-animation">💸 Aplikasi CADAS</h1>
+        <h3 class="text-xl font-medium text-center text-gray-600 mb-8">Catat Duit Adi Sudrajat</h3>
 
         <div id="section-login" class="bg-gray-100 rounded-lg p-6 mb-8">
-            <h2 class="text-2xl font-semibold text-gray-700 mb-4">login</h2>
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4"><i class="fas fa-sign-in-alt mr-2"></i> Login</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label for="username" class="block text-gray-700 text-sm font-bold mb-2">Username:</label>
@@ -91,28 +136,28 @@
                 </div>
             </div>
             <div class="mt-6">
-                <button id="login-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                    Login
+                <button id="login-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline animated-button">
+                    <i class="fas fa-lock mr-2"></i> Login
                 </button>
             </div>
             <div id="error-message" class="text-red-500 text-xs italic mt-4" style="display: none;"></div>
         </div>
 
         <div id="section-logout" class="bg-gray-100 rounded-lg p-6 mb-8" style="display: none;">
-            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Logout</h2>
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4"><i class="fas fa-sign-out-alt mr-2"></i> Logout</h2>
             <p class="text-gray-800 mb-4">Anda telah login. Klik tombol di bawah untuk logout.</p>
-            <button id="logout-button" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                Logout
+            <button id="logout-button" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline animated-button">
+                <i class="fas fa-door-open mr-2"></i> Logout
             </button>
         </div>
 
         <div id="section-saldo" class="bg-indigo-100 rounded-lg p-4 mb-6" style="display: none;">
-            <h2 class="text-xl font-semibold text-indigo-700 mb-2">Saldo Anda</h2>
+            <h2 class="text-xl font-semibold text-indigo-700 mb-2"><i class="fas fa-wallet mr-2"></i> Saldo Anda</h2>
             <p id="total-saldo" class="text-2xl font-bold text-gray-800">Rp 0</p>
         </div>
 
         <div id="section-tambah-transaksi" class="bg-yellow-100 rounded-lg p-6 mb-8" style="display: none;">
-            <h2 class="text-2xl font-semibold text-yellow-700 mb-4">Tambah Transaksi</h2>
+            <h2 class="text-2xl font-semibold text-yellow-700 mb-4"><i class="fas fa-plus-circle mr-2"></i> Tambah Transaksi</h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <label for="tanggal" class="block text-gray-700 text-sm font-bold mb-2">Tanggal:</label>
                 <input type="date" id="tanggal" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
@@ -130,14 +175,14 @@
                 <input type="number" id="jumlah" placeholder="Masukkan jumlah" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
             </div>
             <div class="mt-6">
-                <button id="tambah-transaksi" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                    Tambah Transaksi
+                <button id="tambah-transaksi" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline animated-button">
+                    <i class="fas fa-plus mr-2"></i> Tambah Transaksi
                 </button>
             </div>
         </div>
 
         <div id="section-filter-transaksi" class="bg-purple-100 rounded-lg p-6 mb-8" style="display: none;">
-            <h2 class="text-2xl font-semibold text-purple-700 mb-4">Filter Transaksi</h2>
+            <h2 class="text-2xl font-semibold text-purple-700 mb-4"><i class="fas fa-filter mr-2"></i> Filter Transaksi</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label for="filter-bulan" class="block text-gray-700 text-sm font-bold mb-2">Filter Bulan:</label>
@@ -171,7 +216,7 @@
         </div>
 
         <div id="section-daftar-transaksi" class="bg-green-100 rounded-lg p-6 mb-8" style="display: none;">
-            <h2 class="text-2xl font-semibold text-green-700 mb-4">Daftar Transaksi</h2>
+            <h2 class="text-2xl font-semibold text-green-700 mb-4"><i class="fas fa-list-ul mr-2"></i> Daftar Transaksi</h2>
             <div class="overflow-x-auto">
                 <table id="daftar-transaksi" class="min-w-full leading-normal shadow-md rounded-lg overflow-hidden">
                     <thead class="bg-gray-200 text-gray-700">
@@ -190,10 +235,10 @@
                     </tbody>
                 </table>
             </div>
-            
+
 
         <div id="section-summary" class="bg-red-100 rounded-lg p-6 mb-8" style="display: none;">
-            <h2 class="text-2xl font-semibold text-red-700 mb-4">Ringkasan</h2>
+            <h2 class="text-2xl font-semibold text-red-700 mb-4"><i class="fas fa-chart-pie mr-2"></i> Ringkasan</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <h3 class="text-lg font-semibold text-gray-700">Total Pendapatan:</h3>
@@ -211,8 +256,8 @@
         </div>
 
         <div class="text-center mt-6">
-            <button id="cetak-pdf" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                Cetak
+            <button id="cetak-pdf" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline animated-button">
+                <i class="fas fa-print mr-2"></i> Cetak
             </button>
         </div>
     </div>
@@ -369,13 +414,12 @@
 
             transaksi.push(transaksiBaru);
             localStorage.setItem('transaksi-' + username, JSON.stringify(transaksi)); // Save transaksi
+            renderTransaksi(); // Panggil renderTransaksi setelah menambah transaksi
 
             tanggalInput.value = '';
             jenisInput.value = 'pendapatan';
             kategoriInput.value = '';
             jumlahInput.value = '';
-
-            renderTransaksi();
 
             Swal.fire({
                 icon: 'success',
@@ -386,53 +430,55 @@
             });
         }
 
+
+
         // Fungsi untuk menampilkan detail transaksi
         function tampilkanDetailTransaksi(id) {
-    const transaksiDetail = transaksi.find(t => t.id === id);
-    if (transaksiDetail) {
-        selectedTransaksiId = id;
+            const transaksiDetail = transaksi.find(t => t.id === id);
+            if (transaksiDetail) {
+                selectedTransaksiId = id;
 
-        const tanggalFormatted = new Date(transaksiDetail.tanggal).toLocaleDateString('id-ID', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-        });
+                const tanggalFormatted = new Date(transaksiDetail.tanggal).toLocaleDateString('id-ID', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
 
-        Swal.fire({
-            title: 'Detail Transaksi',
-            html: `
-                <p><strong>Tanggal:</strong> ${tanggalFormatted}</p>
-                <p><strong>Jenis:</strong> ${transaksiDetail.jenis}</p>
-                <p><strong>Kategori:</strong> ${transaksiDetail.kategori}</p>
-                <p><strong>Jumlah:</strong> Rp ${transaksiDetail.jumlah.toLocaleString('id-ID')}</p>
-            `,
-            icon: 'info',
-            showCancelButton: true,
-            confirmButtonText: 'Hapus',
-            cancelButtonText: 'Tutup',
-            confirmButtonColor: '#e11d48',
-            cancelButtonColor: '#3b82f6'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                hapusTransaksiById(selectedTransaksiId);
+                Swal.fire({
+                    title: 'Detail Transaksi',
+                    html: `
+                        <p><strong>Tanggal:</strong> ${tanggalFormatted}</p>
+                        <p><strong>Jenis:</strong> ${transaksiDetail.jenis}</p>
+                        <p><strong>Kategori:</strong> ${transaksiDetail.kategori}</p>
+                        <p><strong>Jumlah:</strong> Rp ${transaksiDetail.jumlah.toLocaleString('id-ID')}</p>
+                    `,
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonText: 'Hapus',
+                    cancelButtonText: 'Tutup',
+                    confirmButtonColor: '#e11d48',
+                    cancelButtonColor: '#3b82f6'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        hapusTransaksiById(selectedTransaksiId);
+                    }
+                });
             }
-        });
-    }
-}
+        }
 
         // Event listener untuk tombol hapus transaksi
-      function hapusTransaksiById(id) {
-    transaksi = transaksi.filter(t => t.id !== id);
-    localStorage.setItem('transaksi-' + username, JSON.stringify(transaksi));
-    renderTransaksi();
-    Swal.fire({
-        icon: 'success',
-        title: 'Berhasil!',
-        text: 'Transaksi dihapus.',
-        timer: 1500,
-        showConfirmButton: false
-    });
-}
+        function hapusTransaksiById(id) {
+            transaksi = transaksi.filter(t => t.id !== id);
+            localStorage.setItem('transaksi-' + username, JSON.stringify(transaksi));
+            renderTransaksi();
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Transaksi dihapus.',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
 
 
         // Fungsi untuk menampilkan daftar transaksi
@@ -448,7 +494,7 @@
             let totalPengeluaran = 0;
             let saldoAkhir = 0;
 
-            const transaksiYangDifilter = transaksi.filter(transaksi => {
+            const transaksiYangDifilter = transaksi.filter(transaksi =>{
                 const tanggalTransaksi = new Date(transaksi.tanggal);
                 const bulanTransaksi = tanggalTransaksi.getMonth().toString();
                 const tahunTransaksi = tanggalTransaksi.getFullYear().toString();
@@ -482,7 +528,7 @@
                         <td class="px-5 py-5 border-b border-gray-200 text-sm text-right">Rp ${transaksi.jumlah.toLocaleString('id-ID')}</td>
                         <td class="px-5 py-5 border-b border-gray-200 text-sm">
                             <button class="lihat-detail bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline text-xs" data-id="${transaksi.id}">
-                                Detail
+                                <i class="fas fa-info-circle"></i> Detail
                             </button>
                         </td>
                     `;
@@ -657,57 +703,57 @@
         filterTahunInput.addEventListener('change', renderTransaksi);
         filterKategoriInput.addEventListener('input', renderTransaksi);
         document.getElementById('cetak-pdf').addEventListener('click', async () => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
 
-    let y = 10;
-    doc.setFontSize(14);
-    doc.text('Laporan Keuangan Pribadi', 105, y, { align: 'center' });
+            let y = 10;
+            doc.setFontSize(14);
+            doc.text('Laporan Keuangan Pribadi', 105, y, { align: 'center' });
 
-    const filtered = transaksi.filter(transaksi => {
-        const tanggal = new Date(transaksi.tanggal);
-        const filterBulan = filterBulanInput.value;
-        const filterTahun = filterTahunInput.value;
-        const filterKategori = filterKategoriInput.value.toLowerCase();
+            const filtered = transaksi.filter(transaksi => {
+                const tanggal = new Date(transaksi.tanggal);
+                const filterBulan = filterBulanInput.value;
+                const filterTahun = filterTahunInput.value;
+                const filterKategori = filterKategoriInput.value.toLowerCase();
 
-        return (!filterBulan || tanggal.getMonth().toString() === filterBulan) &&
-               (!filterTahun || tanggal.getFullYear().toString() === filterTahun) &&
-               (!filterKategori || transaksi.kategori.toLowerCase().includes(filterKategori));
-    });
+                return (!filterBulan || tanggal.getMonth().toString() === filterBulan) &&
+                    (!filterTahun || tanggal.getFullYear().toString() === filterTahun) &&
+                    (!filterKategori || transaksi.kategori.toLowerCase().includes(filterKategori));
+            });
 
-    if (filtered.length === 0) {
-        Swal.fire({
-            icon: 'info',
-            title: 'Tidak Ada Data',
-            text: 'Transaksi yang cocok tidak ditemukan.',
+            if (filtered.length === 0) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Tidak Ada Data',
+                    text: 'Transaksi yang cocok tidak ditemukan.',
+                });
+                return;
+            }
+
+            y += 10;
+            doc.setFontSize(10);
+            doc.text('Tanggal      Jenis        Kategori            Jumlah', 10, y);
+            y += 5;
+            doc.line(10, y, 200, y);
+
+            filtered.forEach(t => {
+                y += 7;
+                const tanggal = new Date(t.tanggal).toLocaleDateString('id-ID');
+                const baris = `${tanggal.padEnd(12)} ${t.jenis.padEnd(10)} ${t.kategori.padEnd(18)} Rp ${t.jumlah.toLocaleString('id-ID')}`;
+                if (y > 270) {
+                    doc.addPage();
+                    y = 10;
+                }
+                doc.text(baris, 10, y);
+            });
+
+            y += 10;
+            doc.text(`Total Pendapatan: ${totalPendapatanElement.textContent}`, 10, y += 7);
+            doc.text(`Total Pengeluaran: ${totalPengeluaranElement.textContent}`, 10, y += 7);
+            doc.text(`Saldo Akhir: ${saldoAkhirElement.textContent}`, 10, y += 7);
+
+            doc.save(`laporan-keuangan-${Date.now()}.pdf`);
         });
-        return;
-    }
-
-    y += 10;
-    doc.setFontSize(10);
-    doc.text('Tanggal      Jenis        Kategori            Jumlah', 10, y);
-    y += 5;
-    doc.line(10, y, 200, y);
-
-    filtered.forEach(t => {
-        y += 7;
-        const tanggal = new Date(t.tanggal).toLocaleDateString('id-ID');
-        const baris = `${tanggal.padEnd(12)} ${t.jenis.padEnd(10)} ${t.kategori.padEnd(18)} Rp ${t.jumlah.toLocaleString('id-ID')}`;
-        if (y > 270) {
-            doc.addPage();
-            y = 10;
-        }
-        doc.text(baris, 10, y);
-    });
-
-    y += 10;
-    doc.text(`Total Pendapatan: ${totalPendapatanElement.textContent}`, 10, y += 7);
-    doc.text(`Total Pengeluaran: ${totalPengeluaranElement.textContent}`, 10, y += 7);
-    doc.text(`Saldo Akhir: ${saldoAkhirElement.textContent}`, 10, y += 7);
-
-    doc.save(`laporan-keuangan-${Date.now()}.pdf`);
-});
 
     </script>
 </body>
