@@ -106,6 +106,14 @@
             </button>
         </div>
 
+        <div class="mb-4">
+  <label for="currency" class="block text-gray-700 text-sm font-bold mb-2">Pilih Mata Uang:</label>
+  <select id="currency" class="border rounded w-full py-2 px-3 text-gray-700">
+    <option value="IDR">Rupiah (Rp)</option>
+    <option value="JPY">Yen (¥)</option>
+    <option value="USD">Dolar ($)</option>
+  </select>
+</div>
         <div id="section-saldo" class="bg-indigo-100 rounded-lg p-4 mb-6" style="display: none;">
             <h2 class="text-xl font-semibold text-indigo-700 mb-2">Saldo Anda</h2>
             <p id="total-saldo" class="text-2xl font-bold text-gray-800">Rp 0</p>
@@ -436,6 +444,17 @@
 
 
         // Fungsi untuk menampilkan daftar transaksi
+        function formatCurrency(amount, currency) {
+    switch (currency) {
+        case 'JPY':
+            return `¥ ${amount.toLocaleString('ja-JP')}`;
+        case 'USD':
+            return `$ ${amount.toLocaleString('en-US')}`;
+        default:
+            return `Rp ${amount.toLocaleString('id-ID')}`;
+    }
+}
+
         function renderTransaksi() {
             const transaksiListBody = daftarTransaksiTable.querySelector('tbody');
             transaksiListBody.innerHTML = '';
@@ -479,7 +498,8 @@
                         <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="font-italic text-gray-800">${tanggalFormatted}</span></td>
                         <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="font-semibold ${transaksi.jenis === 'pendapatan' ? 'transaksi-positif': 'transaksi-negatif'}">${transaksi.jenis}</span></td>
                         <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="font-oblique font-sans text-purple-600">${transaksi.kategori}</span></td>
-                        <td class="px-5 py-5 border-b border-gray-200 text-sm text-right">Rp ${transaksi.jumlah.toLocaleString('id-ID')}</td>
+                        <td class="px-5 py-5 border-b border-gray-200 text-sm text-right">${formatCurrency(transaksi.jumlah, currentCurrency)}</td>
+
                         <td class="px-5 py-5 border-b border-gray-200 text-sm">
                             <button class="lihat-detail bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline text-xs" data-id="${transaksi.id}">
                                 Detail
@@ -507,10 +527,11 @@
 
             saldoAkhir = totalPendapatan - totalPengeluaran;
 
-            totalSaldoElement.textContent = `Rp ${saldoAkhir.toLocaleString('id-ID')}`;
-            totalPendapatanElement.textContent = `Rp ${totalPendapatan.toLocaleString('id-ID')}`;
-            totalPengeluaranElement.textContent = `Rp ${totalPengeluaran.toLocaleString('id-ID')}`;
-            saldoAkhirElement.textContent = `Rp ${saldoAkhir.toLocaleString('id-ID')}`;
+           totalSaldoElement.textContent = formatCurrency(saldoAkhir, currentCurrency);
+totalPendapatanElement.textContent = formatCurrency(totalPendapatan, currentCurrency);
+totalPengeluaranElement.textContent = formatCurrency(totalPengeluaran, currentCurrency);
+saldoAkhirElement.textContent = formatCurrency(saldoAkhir, currentCurrency);
+
         }
 
         // Fungsi untuk mencetak laporan
@@ -707,6 +728,16 @@
     doc.text(`Saldo Akhir: ${saldoAkhirElement.textContent}`, 10, y += 7);
 
     doc.save(`laporan-keuangan-${Date.now()}.pdf`);
+});
+
+        const currencySelect = document.getElementById('currency');
+let currentCurrency = localStorage.getItem('selectedCurrency') || 'IDR';
+currencySelect.value = currentCurrency;
+
+currencySelect.addEventListener('change', () => {
+    currentCurrency = currencySelect.value;
+    localStorage.setItem('selectedCurrency', currentCurrency);
+    renderTransaksi();
 });
 
     </script>
