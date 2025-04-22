@@ -455,7 +455,7 @@
                 const kategoriTransaksi = transaksi.kategori.toLowerCase();
 
                 const cocokBulan = !filterBulan || bulanTransaksi === filterBulan;
-                const cocokTahun = !filterTahun || tahunTransaksi === tahunTransaksi; // Tambahkan ini
+                const cocokTahun = !filterTahun || tahunTransaksi === filterTahun; // Tambahkan ini
                 const cocokKategori = !filterKategori || kategoriTransaksi.includes(filterKategori);
 
                 return cocokBulan && cocokTahun && cocokKategori;
