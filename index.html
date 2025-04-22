@@ -212,18 +212,14 @@
             </div>
         </div>
 
-        <div class="text-center mt-6">
-            <button id="cetak-pdf" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                Cetak
-            </button>
-
-            
-            <button id="export-excel" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-2">
-    Export Excel
-</button>
-        </div>
-
-    </div>
+      <div class="text-center mt-6 flex justify-center gap-4">
+    <button id="cetak-pdf" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        Cetak PDF
+    </button>
+    <button id="export-excel" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        Export Excel
+    </button>
+</div>
 
     <script>
         // Data transaksi (sementara, akan disimpan di localStorage setelah login)
@@ -683,6 +679,15 @@
         return cocokBulan && cocokTahun && cocokKategori;
     });
 
+    if (transaksiYangDifilter.length === 0) {
+        Swal.fire({
+            icon: 'info',
+            title: 'Tidak Ada Data',
+            text: 'Tidak ada transaksi yang cocok untuk diekspor.',
+        });
+        return;
+    }
+
     const dataExcel = transaksiYangDifilter.map(t => ({
         Tanggal: new Date(t.tanggal).toLocaleDateString('id-ID'),
         Jenis: t.jenis,
@@ -698,7 +703,5 @@
 });
 
     </script>
-
-        
 </body>
 </html>
