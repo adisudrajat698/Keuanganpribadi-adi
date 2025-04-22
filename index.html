@@ -190,7 +190,7 @@
                     </tbody>
                 </table>
             </div>
-            <div id="detail-transaksi" class="mt-4 detail-transaksi" style="display: none;">
+
                 <h3 class="text-lg font-semibold text-blue-700 mb-2">Detail Transaksi</h3>
                 <p><strong>Tanggal:</strong> <span id="detail-tanggal"></span></p>
                 <p><strong>Jenis:</strong> <span id="detail-jenis"></span></p>
@@ -397,24 +397,37 @@
         }
 
         // Fungsi untuk menampilkan detail transaksi
-        function tampilkanDetailTransaksi(id) {
-            const transaksiDetail = transaksi.find(t => t.id === id);
-            if (transaksiDetail) {
-                selectedTransaksiId = id;
-                const tanggalFormatted = new Date(transaksiDetail.tanggal).toLocaleDateString('id-ID', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
-                });
-                detailTanggalElement.textContent = tanggalFormatted;
-                detailJenisElement.textContent = transaksiDetail.jenis;
-                detailKategoriElement.textContent = transaksiDetail.kategori;
-                detailJumlahElement.textContent = `Rp ${transaksiDetail.jumlah.toLocaleString('id-ID')}`;
-                detailTransaksiDiv.style.display = 'block';
-            } else {
-                detailTransaksiDiv.style.display = 'none';
+    function tampilkanDetailTransaksi(id) {
+    const transaksiDetail = transaksi.find(t => t.id === id);
+    if (transaksiDetail) {
+        selectedTransaksiId = id;
+        const tanggalFormatted = new Date(transaksiDetail.tanggal).toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+
+        Swal.fire({
+            title: 'Detail Transaksi',
+            html: `
+                <p><strong>Tanggal:</strong> ${tanggalFormatted}</p>
+                <p><strong>Jenis:</strong> ${transaksiDetail.jenis}</p>
+                <p><strong>Kategori:</strong> ${transaksiDetail.kategori}</p>
+                <p><strong>Jumlah:</strong> Rp ${transaksiDetail.jumlah.toLocaleString('id-ID')}</p>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Tutup',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                hapusTransaksiButton();
             }
-        }
+        });
+    }
+}
+
 
         // Event listener untuk tombol hapus transaksi
         hapusTransaksiButton.addEventListener('click', () => {
