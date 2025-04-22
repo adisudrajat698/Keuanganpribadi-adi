@@ -422,7 +422,7 @@
             cancelButtonColor: '#3085d6'
         }).then((result) => {
             if (result.isConfirmed) {
-                hapusTransaksiButton();
+                hapusTransaksi();
             }
         });
     }
@@ -430,32 +430,23 @@
 
 
         // Event listener untuk tombol hapus transaksi
-        hapusTransaksiButton.addEventListener('click', () => {
-            if (selectedTransaksiId !== null) {
-                Swal.fire({
-                    title: 'Apakah Anda yakin?',
-                    text: "Transaksi ini akan dihapus permanen!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Ya, hapus!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        transaksi = transaksi.filter(t => t.id !== selectedTransaksiId);
-                        localStorage.setItem('transaksi-' + username, JSON.stringify(transaksi)); // Update transaksi
-                        renderTransaksi();
-                        detailTransaksiDiv.style.display = 'none';
-                        Swal.fire(
-                            'Terhapus!',
-                            'Transaksi Anda telah dihapus.',
-                            'success'
-                        );
-                    }
-                });
-            }
+      function hapusTransaksi() {
+    if (selectedTransaksiId !== null) {
+        transaksi = transaksi.filter(t => t.id !== selectedTransaksiId);
+        localStorage.setItem('transaksi-' + username, JSON.stringify(transaksi));
+        renderTransaksi();
+        selectedTransaksiId = null;
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Terhapus!',
+            text: 'Transaksi berhasil dihapus.',
+            timer: 1500,
+            showConfirmButton: false
         });
+    }
+}
+
 
         // Fungsi untuk menampilkan daftar transaksi
         function renderTransaksi() {
