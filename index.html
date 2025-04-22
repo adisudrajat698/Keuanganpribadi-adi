@@ -8,6 +8,11 @@
     <script src="https://unpkg.com/@tailwindcss/browser@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Firebase App (core) SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
     <style>
         /* Gaya CSS Kustom (jika diperlukan) */
         .transaksi-positif {
@@ -219,6 +224,22 @@
 
     <script>
         // Data transaksi (sementara, akan disimpan di localStorage setelah login)
+
+        // Konfigurasi Firebase kamu
+const firebaseConfig = {
+  apiKey: "AIzaSyDvf_Rg89uX9ODamiUjTCZ-ZTIYA2C7a7w",
+  authDomain: "keuanganadi.firebaseapp.com",
+  projectId: "keuanganadi",
+  storageBucket: "keuanganadi.firebasestorage.app",
+  messagingSenderId: "829317955644",
+  appId: "1:829317955644:web:ecd350db338c02ab0fc339",
+  measurementId: "G-WDNBRP6DB5"
+};
+
+// Inisialisasi Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
         let transaksi = [];
         let isLoggedIn = false;
         let username = "";
@@ -343,48 +364,63 @@
         });
 
         // Fungsi untuk menambahkan transaksi baru
-        function tambahTransaksi() {
-            const tanggal = tanggalInput.value;
-            const jenis = jenisInput.value;
-            const kategori = kategoriInput.value;
-            const jumlah = parseFloat(jumlahInput.value);
+       async function tambahTransaksi() {
+  const tanggal = tanggalInput.value;
+  const jenis = jenisInput.value;
+  const kategori = kategoriInput.value;
+  const jumlah = parseFloat(jumlahInput.value);
 
-            if (!tanggal || !jenis || !kategori || isNaN(jumlah)) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Harap isi semua field dengan benar.',
-                });
-                return;
-            }
+  if (!tanggal || !jenis || !kategori || isNaN(jumlah)) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'Harap isi semua field dengan benar.',
+    });
+    return;
+  }
 
-            const transaksiBaru = {
-                id: Date.now(), // Tambahkan ID unik
-                tanggal,
-                jenis,
-                kategori,
-                jumlah,
-                timestamp: new Date().getTime()
-            };
+  const transaksiBaru = {
+    tanggal,
+    jenis,
+    kategori,
+    jumlah,
+    user: username,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  };
 
-            transaksi.push(transaksiBaru);
-            localStorage.setItem('transaksi-' + username, JSON.stringify(transaksi)); // Save transaksi
+  await db.collection('transaksi').add(transaksiBaru);
 
-            tanggalInput.value = '';
-            jenisInput.value = 'pendapatan';
-            kategoriInput.value = '';
-            jumlahInput.value = '';
+  // Ambil ulang data dari Firestore
+  await loadTransaksiFromFirebase();
 
-            renderTransaksi();
+  tanggalInput.value = '';
+  jenisInput.value = 'pendapatan';
+  kategoriInput.value = '';
+  jumlahInput.value = '';
 
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: 'Transaksi Anda telah ditambahkan.',
-                timer: 1500,
-                showConfirmButton: false,
-            });
-        }
+  renderTransaksi();
+
+  Swal.fire({
+    icon: 'success',
+    title: 'Berhasil!',
+    text: 'Transaksi Anda telah ditambahkan.',
+    timer: 1500,
+    showConfirmButton: false,
+  });
+}
+
+        async function loadTransaksiFromFirebase() {
+  const snapshot = await db.collection('transaksi')
+    .where("user", "==", username)
+    .orderBy("timestamp", "desc")
+    .get();
+
+  transaksi = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+}
+
 
         // Fungsi untuk menampilkan detail transaksi
         function tampilkanDetailTransaksi(id) {
