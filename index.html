@@ -8,6 +8,8 @@
     <script src="https://unpkg.com/@tailwindcss/browser@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <style>
         /* Gaya CSS Kustom (jika diperlukan) */
         .transaksi-positif {
@@ -215,6 +217,10 @@
                 Cetak
             </button>
         </div>
+
+            <button id="export-excel" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-2">
+    Export Excel
+</button>
     </div>
 
     <script>
@@ -657,6 +663,40 @@
         filterTahunInput.addEventListener('change', renderTransaksi);
         filterKategoriInput.addEventListener('input', renderTransaksi);
         cetPdfButton.addEventListener('click', cetakLaporan);
+
+        document.getElementById('export-excel').addEventListener('click', () => {
+    const transaksiYangDifilter = transaksi.filter(transaksi => {
+        const tanggalTransaksi = new Date(transaksi.tanggal);
+        const bulanTransaksi = tanggalTransaksi.getMonth().toString();
+        const tahunTransaksi = tanggalTransaksi.getFullYear().toString();
+        const kategoriTransaksi = transaksi.kategori.toLowerCase();
+        const filterBulan = filterBulanInput.value;
+        const filterTahun = filterTahunInput.value;
+        const filterKategori = filterKategoriInput.value.toLowerCase();
+
+        const cocokBulan = !filterBulan || bulanTransaksi === filterBulan;
+        const cocokTahun = !filterTahun || tahunTransaksi === filterTahun;
+        const cocokKategori = !filterKategori || kategoriTransaksi.includes(filterKategori);
+
+        return cocokBulan && cocokTahun && cocokKategori;
+    });
+
+    const dataExcel = transaksiYangDifilter.map(t => ({
+        Tanggal: new Date(t.tanggal).toLocaleDateString('id-ID'),
+        Jenis: t.jenis,
+        Kategori: t.kategori,
+        Jumlah: t.jumlah
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataExcel);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan");
+
+    XLSX.writeFile(workbook, `laporan-keuangan-${Date.now()}.xlsx`);
+});
+
     </script>
+
+        
 </body>
 </html>
