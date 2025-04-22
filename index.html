@@ -8,7 +8,6 @@
     <script src="https://unpkg.com/@tailwindcss/browser@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" />
     <style>
         /* Gaya CSS Kustom (jika diperlukan) */
         .transaksi-positif {
@@ -668,22 +667,5 @@
         filterKategoriInput.addEventListener('input', renderTransaksi);
         cetPdfButton.addEventListener('click', cetakLaporan);
     </script>
-    <!-- Simple-DataTables JS -->
-<script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" defer></script>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Tunggu tabel muncul dulu sebelum diinisialisasi
-        const section = document.getElementById("section-daftar-transaksi");
-
-        const observer = new MutationObserver(() => {
-            if (section.style.display !== "none") {
-                const table = document.querySelector("#daftar-transaksi");
-                if (table && !table.classList.contains("datatable-initialized")) {
-                    new simpleDatatables.DataTable(table);
-                    table.classList.add("datatable-initialized");
-                }
-            }
-        });
 </body>
 </html>
