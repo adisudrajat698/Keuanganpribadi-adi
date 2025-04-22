@@ -307,7 +307,8 @@ const db = firebase.firestore();
         }
 
         // Event listener untuk tombol login
-        loginButton.addEventListener('click', () => {
+        loginButton.addEventListener('click', async () => {
+
             const enteredUsername = usernameInput.value;
             const enteredPassword = passwordInput.value;
 
@@ -389,6 +390,9 @@ const db = firebase.firestore();
   };
 
   await db.collection('transaksi').add(transaksiBaru);
+
+           await loadTransaksiFromFirebase();
+  renderTransaksi();
 
   // Ambil ulang data dari Firestore
   await loadTransaksiFromFirebase();
@@ -664,9 +668,9 @@ const db = firebase.firestore();
         }
 
         // Inisialisasi aplikasi
-        if (localStorage.getItem('isLoggedIn') === 'true') {
-            isLoggedIn = true;
-            username = localStorage.getItem('username');
+       loadTransaksiFromFirebase().then(() => {
+    toggleSections();
+    renderTransaksi();
             const storedTransaksi = localStorage.getItem('transaksi-' + username);
             if (storedTransaksi) {
                 transaksi = JSON.parse(storedTransaksi);
