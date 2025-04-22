@@ -557,58 +557,6 @@
             totalPendapatanElement.textContent = `Rp ${totalPendapatan.toLocaleString('id-ID')}`;
             totalPengeluaranElement.textContent = `Rp ${totalPengeluaran.toLocaleString('id-ID')}`;
             saldoAkhirElement.textContent = `Rp ${saldoAkhir.toLocaleString('id-ID')}`;
-
-
-             // Render Pie Chart
-            renderPieChart(totalPendapatan, totalPengeluaran);
-        }
-
-        function renderPieChart(totalPendapatan, totalPengeluaran) {
-            const data = {
-                labels: ['Pendapatan', 'Pengeluaran'],
-                datasets: [{
-                    label: 'Transaksi',
-                    data: [totalPendapatan, totalPengeluaran],
-                    backgroundColor: [
-                        'rgba(56, 189, 248, 0.7)', // Tailwind blue-400
-                        'rgba(220, 38, 38, 0.7)' // Tailwind red-600
-                    ],
-                    borderColor: [
-                        'rgba(56, 189, 248, 1)',
-                        'rgba(220, 38, 38, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            };
-
-            const options = {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    title: {
-                        display: true,
-                        text: 'Ringkasan Transaksi',
-                        font: {
-                            size: 50
-                        }
-                    }
-                }
-            };
-
-            // Destroy existing chart if it exists
-            if (pieChart) {
-                pieChart.destroy();
-            }
-
-            pieChart = new Chart(pieChartCanvas, {
-                type: 'pie',
-                data: data,
-                options: options
-            });
-        }
         }
 
         // Fungsi untuk mencetak laporan
