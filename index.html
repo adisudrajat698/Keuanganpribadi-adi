@@ -667,24 +667,7 @@
         filterKategoriInput.addEventListener('input', renderTransaksi);
         cetPdfButton.addEventListener('click', cetakLaporan);
     </script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" />
-<script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" defer></script>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const daftarTransaksiSection = document.getElementById("section-daftar-transaksi");
-        const daftarTransaksiTable = document.getElementById("daftar-transaksi");
-
-        const observer = new MutationObserver(() => {
-            if (daftarTransaksiSection.style.display !== "none" && !daftarTransaksiTable.classList.contains("datatable-initialized")) {
-                new simpleDatatables.DataTable(daftarTransaksiTable);
-                daftarTransaksiTable.classList.add("datatable-initialized");
-            }
-        });
-
-        observer.observe(daftarTransaksiSection, { attributes: true, attributeFilter: ["style"] });
-    });
-</script>
 
 </body>
 </html>
