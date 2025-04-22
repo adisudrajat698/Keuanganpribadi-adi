@@ -315,7 +315,7 @@
                 Swal.fire({
                     icon: 'success',
                     title: 'Berhasil!',
-                    text: 'Anda berhasil login.',
+                    text: 'Anda berhasil login.', 
                     timer: 1500,
                     showConfirmButton: false,
                 });
@@ -667,5 +667,26 @@
         filterKategoriInput.addEventListener('input', renderTransaksi);
         cetPdfButton.addEventListener('click', cetakLaporan);
     </script>
+    <!-- Simple-DataTables CSS & JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" />
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" defer></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Cek apakah user login dan tabel ditampilkan
+        const daftarTransaksiSection = document.getElementById("section-daftar-transaksi");
+        const daftarTransaksiTable = document.getElementById("daftar-transaksi");
+
+        const observer = new MutationObserver(() => {
+            if (daftarTransaksiSection.style.display !== "none" && !daftarTransaksiTable.classList.contains("datatable-initialized")) {
+                new simpleDatatables.DataTable(daftarTransaksiTable);
+                daftarTransaksiTable.classList.add("datatable-initialized");
+            }
+        });
+
+        observer.observe(daftarTransaksiSection, { attributes: true, attributeFilter: ["style"] });
+    });
+</script>
+
 </body>
 </html>
