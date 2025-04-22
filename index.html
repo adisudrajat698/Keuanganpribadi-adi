@@ -219,18 +219,6 @@
 
     <script>
         // Data transaksi (sementara, akan disimpan di localStorage setelah login)
-        // Fungsi ambil kurs dari exchangerate.host
-async function getExchangeRate(fromCurrency, toCurrency = 'IDR') {
-    try {
-        const response = await fetch(`https://api.exchangerate.host/latest?base=${fromCurrency}&symbols=${toCurrency}`);
-        const data = await response.json();
-        return data.rates[toCurrency];
-    } catch (err) {
-        console.error('Gagal mengambil kurs:', err);
-        return 1; // fallback ke 1 jika error
-    }
-}
-
         let transaksi = [];
         let isLoggedIn = false;
         let username = "";
@@ -355,57 +343,48 @@ async function getExchangeRate(fromCurrency, toCurrency = 'IDR') {
         });
 
         // Fungsi untuk menambahkan transaksi baru
-        async function tambahTransaksi() {
-    const tanggal = tanggalInput.value;
-    const jenis = jenisInput.value;
-    const kategori = kategoriInput.value;
-    const jumlah = parseFloat(jumlahInput.value);
-    const mataUang = document.getElementById('mata-uang').value;
+        function tambahTransaksi() {
+            const tanggal = tanggalInput.value;
+            const jenis = jenisInput.value;
+            const kategori = kategoriInput.value;
+            const jumlah = parseFloat(jumlahInput.value);
 
-    if (!tanggal || !jenis || !kategori || isNaN(jumlah)) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Harap isi semua field dengan benar.',
-        });
-        return;
-    }
+            if (!tanggal || !jenis || !kategori || isNaN(jumlah)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Harap isi semua field dengan benar.',
+                });
+                return;
+            }
 
-    const rate = mataUang === 'IDR' ? 1 : await getExchangeRate(mataUang, 'IDR');
-    const jumlahDalamIDR = jumlah * rate;
+            const transaksiBaru = {
+                id: Date.now(), // Tambahkan ID unik
+                tanggal,
+                jenis,
+                kategori,
+                jumlah,
+                timestamp: new Date().getTime()
+            };
 
-    const transaksiBaru = {
-        id: Date.now(),
-        tanggal,
-        jenis,
-        kategori,
-        jumlah,
-        mataUang,
-        jumlahDalamIDR,
-        rate,
-        timestamp: new Date().getTime()
-    };
+            transaksi.push(transaksiBaru);
+            localStorage.setItem('transaksi-' + username, JSON.stringify(transaksi)); // Save transaksi
 
-    transaksi.push(transaksiBaru);
-    localStorage.setItem('transaksi-' + username, JSON.stringify(transaksi));
+            tanggalInput.value = '';
+            jenisInput.value = 'pendapatan';
+            kategoriInput.value = '';
+            jumlahInput.value = '';
 
-    tanggalInput.value = '';
-    jenisInput.value = 'pendapatan';
-    kategoriInput.value = '';
-    jumlahInput.value = '';
-    document.getElementById('mata-uang').value = 'IDR';
+            renderTransaksi();
 
-    renderTransaksi();
-
-    Swal.fire({
-        icon: 'success',
-        title: 'Berhasil!',
-        text: 'Transaksi Anda telah ditambahkan.',
-        timer: 1500,
-        showConfirmButton: false,
-    });
-}
-
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Transaksi Anda telah ditambahkan.',
+                timer: 1500,
+                showConfirmButton: false,
+            });
+        }
 
         // Fungsi untuk menampilkan detail transaksi
         function tampilkanDetailTransaksi(id) {
@@ -500,11 +479,7 @@ async function getExchangeRate(fromCurrency, toCurrency = 'IDR') {
                         <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="font-italic text-gray-800">${tanggalFormatted}</span></td>
                         <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="font-semibold ${transaksi.jenis === 'pendapatan' ? 'transaksi-positif': 'transaksi-negatif'}">${transaksi.jenis}</span></td>
                         <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="font-oblique font-sans text-purple-600">${transaksi.kategori}</span></td>
-                        <td class="px-5 py-5 border-b border-gray-200 text-sm text-right">
-    ${transaksi.mataUang} ${transaksi.jumlah.toLocaleString()}<br/>
-    <span class="text-xs text-gray-500">≈ Rp ${transaksi.jumlahDalamIDR.toLocaleString('id-ID')}</span>
-</td>
-
+                        <td class="px-5 py-5 border-b border-gray-200 text-sm text-right">Rp ${transaksi.jumlah.toLocaleString('id-ID')}</td>
                         <td class="px-5 py-5 border-b border-gray-200 text-sm">
                             <button class="lihat-detail bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline text-xs" data-id="${transaksi.id}">
                                 Detail
@@ -514,9 +489,9 @@ async function getExchangeRate(fromCurrency, toCurrency = 'IDR') {
                     transaksiListBody.appendChild(row);
 
                     if (transaksi.jenis === 'pendapatan') {
-                        totalPendapatan += transaksi.jumlahDalamIDR;
+                        totalPendapatan += transaksi.jumlah;
                     } else {
-                        totalPengeluaran += transaksi.jumlahDalamIDR;
+                        totalPengeluaran += transaksi.jumlah;
                     }
                 });
 
