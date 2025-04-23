@@ -337,7 +337,7 @@
         let isLoggedIn = false;
         let username = "";
         let selectedTransaksiId = null;
-        let currentPage = 1;
+    
         const recordsPerPage = 5; // Jumlah transaksi per halaman
 
         // Mendapatkan elemen-elemen HTML
@@ -585,9 +585,8 @@
                 return new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime();
             });
 
-            const startIndex = (currentPage - 1) * recordsPerPage;
-            const endIndex = startIndex + recordsPerPage;
-            const transaksiHalamanIni = transaksiYangDifilter.slice(startIndex, endIndex);
+           const transaksiHalamanIni = transaksiYangDifilter;
+
 
             if (transaksiYangDifilter.length === 0) {
                 transaksiListBody.innerHTML = `<tr><td colspan="5" class="px-5 py-5 border-b border-gray-200 text-sm text-gray-500">Tidak ada transaksi yang sesuai dengan filter.</td></tr>`;
@@ -631,8 +630,7 @@
                     });
                 });
 
-                prevPageButton.disabled = currentPage === 1;
-                nextPageButton.disabled = endIndex >= transaksiYangDifilter.length;
+                
             }
 
             saldoAkhir = totalPendapatan - totalPengeluaran;
@@ -840,22 +838,10 @@
         });
 
         // Event listener untuk tombol previous page
-        prevPageButton.addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                renderTransaksi();
-            }
-        });
+
 
         // Event listener untuk tombol next page
-        nextPageButton.addEventListener('click', () => {
-            const totalPages = Math.ceil(transaksi.length / recordsPerPage);
-            if (currentPage < totalPages) {
-                currentPage++;
-                renderTransaksi();
-            }
-        });
-
+      
     </script>
 </body>
 </html>
