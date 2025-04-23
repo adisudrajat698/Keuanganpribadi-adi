@@ -416,6 +416,27 @@
             localStorage.setItem('transaksi-' + username, JSON.stringify(transaksi)); // Save transaksi
             renderTransaksi(); // Panggil renderTransaksi setelah menambah transaksi
 
+                // ✅ Cek apakah pengeluaran lebih besar dari pendapatan
+let totalPendapatan = 0;
+let totalPengeluaran = 0;
+
+transaksi.forEach(t => {
+    if (t.jenis === 'pendapatan') {
+        totalPendapatan += t.jumlah;
+    } else {
+        totalPengeluaran += t.jumlah;
+    }
+});
+
+if (totalPengeluaran > totalPendapatan) {
+    Swal.fire({
+        icon: 'warning',
+        title: 'Pengeluaran Melebihi Pendapatan!',
+        text: `Total pengeluaran (Rp ${totalPengeluaran.toLocaleString('id-ID')}) sudah melebihi pendapatan (Rp ${totalPendapatan.toLocaleString('id-ID')}). Ayo atur lagi keuanganmu!`
+    });
+}
+
+
             tanggalInput.value = '';
             jenisInput.value = 'pendapatan';
             kategoriInput.value = '';
