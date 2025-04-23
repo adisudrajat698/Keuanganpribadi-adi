@@ -286,10 +286,6 @@
                     </tbody>
                 </table>
             </div>
-            <div class="pagination">
-                <button id="prev-page" disabled>Previous</button>
-                <button id="next-page">Next</button>
-            </div>
             <p class="mt-4 text-gray-600 text-sm">
                 <i class="fas fa-history mr-1"></i>
                 <b>Motivasi:</b> "Setiap transaksi adalah bagian dari cerita keuangan Anda. Catat dengan baik!"
@@ -585,9 +581,8 @@
                 return new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime();
             });
 
-            const startIndex = (currentPage - 1) * recordsPerPage;
-            const endIndex = startIndex + recordsPerPage;
-            const transaksiHalamanIni = transaksiYangDifilter.slice(startIndex, endIndex);
+         const transaksiHalamanIni = transaksiYangDifilter; // tampilkan semua transaksi tanpa pagination
+
 
             if (transaksiYangDifilter.length === 0) {
                 transaksiListBody.innerHTML = `<tr><td colspan="5" class="px-5 py-5 border-b border-gray-200 text-sm text-gray-500">Tidak ada transaksi yang sesuai dengan filter.</td></tr>`;
