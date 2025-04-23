@@ -116,6 +116,37 @@
           to { transform: rotate(360deg); }
         }
 
+        /* Gaya untuk Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .pagination button {
+            margin: 0 5px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            color: #333;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .pagination button:hover {
+            background-color: #f0f0f0;
+        }
+        .pagination button.active {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+        .pagination button:disabled {
+            background-color: #ddd;
+            color: #aaa;
+            cursor: not-allowed;
+            border-color: #ddd;
+        }
+
     </style>
 </head>
 <body class="bg-gray-100 font-inter">
@@ -141,6 +172,10 @@
                 </button>
             </div>
             <div id="error-message" class="text-red-500 text-xs italic mt-4" style="display: none;"></div>
+             <p class="mt-4 text-gray-600 text-sm">
+                <i class="fas fa-info-circle mr-1"></i>
+                <b>Pengingat:</b> Selalu catat setiap transaksi Anda agar keuangan Anda terkontrol dengan baik.
+            </p>
         </div>
 
         <div id="section-logout" class="bg-gray-100 rounded-lg p-6 mb-8" style="display: none;">
@@ -149,11 +184,19 @@
             <button id="logout-button" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline animated-button">
                 <i class="fas fa-door-open mr-2"></i> Logout
             </button>
+             <p class="mt-4 text-gray-600 text-sm">
+                <i class="fas fa-check-circle mr-1"></i>
+                <b>Motivasi:</b> "Setiap pengeluaran yang dicatat adalah langkah menuju kebebasan finansial."
+            </p>
         </div>
 
         <div id="section-saldo" class="bg-indigo-100 rounded-lg p-4 mb-6" style="display: none;">
             <h2 class="text-xl font-semibold text-indigo-700 mb-2"><i class="fas fa-wallet mr-2"></i> Saldo Anda</h2>
             <p id="total-saldo" class="text-2xl font-bold text-gray-800">Rp 0</p>
+             <p class="mt-2 text-gray-600 text-sm">
+                <i class="fas fa-money-check-alt mr-1"></i>
+                <b>Motivasi:</b> "Saldo yang bertambah adalah hasil dari kedisiplinan dan perencanaan yang baik."
+            </p>
         </div>
 
         <div id="section-tambah-transaksi" class="bg-yellow-100 rounded-lg p-6 mb-8" style="display: none;">
@@ -161,13 +204,16 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <label for="tanggal" class="block text-gray-700 text-sm font-bold mb-2">Tanggal:</label>
                 <input type="date" id="tanggal" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+
                 <label for="jenis" class="block text-gray-700 text-sm font-bold mb-2">Jenis:</label>
                 <select id="jenis" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                     <option value="pendapatan">Pendapatan</option>
                     <option value="pengeluaran">Pengeluaran</option>
                 </select>
+
                 <label for="kategori" class="block text-gray-700 text-sm font-bold mb-2">Kategori:</label>
                 <input type="text" id="kategori" placeholder="Makanan, Transport..." class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+
                 <label for="jumlah" class="block text-gray-700 text-sm font-bold mb-2">Jumlah:</label>
                 <input type="number" id="jumlah" placeholder="Masukkan jumlah" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
             </div>
@@ -176,6 +222,10 @@
                     <i class="fas fa-plus mr-2"></i> Tambah Transaksi
                 </button>
             </div>
+             <p class="mt-4 text-gray-600 text-sm">
+                <i class="fas fa-lightbulb mr-1"></i>
+                <b>Tips:</b> Selalu kategorikan transaksi Anda untuk analisis yang lebih baik.
+            </p>
         </div>
 
         <div id="section-filter-transaksi" class="bg-purple-100 rounded-lg p-6 mb-8" style="display: none;">
@@ -210,11 +260,15 @@
                     <input type="text" id="filter-kategori" placeholder="Cari Kategori" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
                 </div>
             </div>
+             <p class="mt-4 text-gray-600 text-sm">
+                <i class="fas fa-search mr-1"></i>
+                <b>Pengingat:</b> Gunakan filter untuk melihat riwayat transaksi Anda dengan lebih mudah.
+            </p>
         </div>
 
         <div id="section-daftar-transaksi" class="bg-green-100 rounded-lg p-6 mb-8" style="display: none;">
             <h2 class="text-2xl font-semibold text-green-700 mb-4"><i class="fas fa-list-ul mr-2"></i> Daftar Transaksi</h2>
-             <div class="overflow-x-auto">
+            <div class="overflow-x-auto">
                 <table id="daftar-transaksi" class="min-w-full leading-normal shadow-md rounded-lg overflow-hidden">
                     <thead class="bg-gray-200 text-gray-700">
                         <tr>
@@ -232,7 +286,14 @@
                     </tbody>
                 </table>
             </div>
-        </div>
+            <div class="pagination">
+                <button id="prev-page" disabled>Previous</button>
+                <button id="next-page">Next</button>
+            </div>
+            <p class="mt-4 text-gray-600 text-sm">
+                <i class="fas fa-history mr-1"></i>
+                <b>Motivasi:</b> "Setiap transaksi adalah bagian dari cerita keuangan Anda. Catat dengan baik!"
+            </p>
 
         <div id="section-summary" class="bg-red-100 rounded-lg p-6 mb-8" style="display: none;">
             <h2 class="text-2xl font-semibold text-red-700 mb-4"><i class="fas fa-chart-pie mr-2"></i> Ringkasan</h2>
@@ -250,14 +311,25 @@
                     <p id="saldo-akhir" class="text-xl font-bold text-blue-600">Rp 0</p>
                 </div>
             </div>
+            <p class="mt-4 text-gray-600 text-sm">
+                <i class="fas fa-chart-line mr-1"></i>
+                <b>Motivasi:</b> "Ringkasan ini membantu Anda melihat gambaran besar keuangan Anda."
+            </p>
         </div>
 
         <div class="text-center mt-6">
             <button id="cetak-pdf" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline animated-button">
                 <i class="fas fa-print mr-2"></i> Cetak
             </button>
+             <p class="mt-4 text-gray-600 text-sm">
+                <i class="fas fa-file-pdf mr-1"></i>
+                <b>Pengingat:</b> Cetak laporan untuk dokumentasi fisik dan perencanaan di masa mendatang.
+            </p>
         </div>
     </div>
+ <footer class="copyright">
+        &copy; 2024 Adi Sudrajat. All rights reserved.
+    </footer>
 
     <script>
         // Data transaksi (sementara, akan disimpan di localStorage setelah login)
@@ -265,8 +337,8 @@
         let isLoggedIn = false;
         let username = "";
         let selectedTransaksiId = null;
-        const BULAN_DALAM_INDONESIA = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
-                                    "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        let currentPage = 1;
+        const recordsPerPage = 5; // Jumlah transaksi per halaman
 
         // Mendapatkan elemen-elemen HTML
         const loginButton = document.getElementById('login-button');
@@ -279,6 +351,8 @@
         const daftarTransaksiTable = document.getElementById('daftar-transaksi');
         const summarySection = document.getElementById('section-summary');
         const cetPdfButton = document.getElementById('cetak-pdf');
+        const prevPageButton = document.getElementById('prev-page');
+        const nextPageButton = document.getElementById('next-page');
 
         const usernameInput = document.getElementById('username');
         const passwordInput = document.getElementById('password');
@@ -317,6 +391,7 @@
                 daftarTransaksiTable.parentElement.parentElement.style.display = 'block';
                 summarySection.style.display = 'block';
                 cetPdfButton.parentElement.style.display = 'block';
+                prevPageButton.parentElement.style.display = 'flex'; //memastikan tombol navigasi selalu flex
             } else {
                 loginSection.style.display = 'block';
                 logoutSection.style.display = 'none';
@@ -326,6 +401,7 @@
                 daftarTransaksiTable.parentElement.parentElement.style.display = 'none';
                 summarySection.style.display = 'none';
                 cetPdfButton.parentElement.style.display = 'none';
+                prevPageButton.parentElement.style.display = 'none';
             }
         }
 
@@ -427,9 +503,9 @@
                 timer: 1500,
                 showConfirmButton: false,
             });
-             // Cek notifikasi pengeluaran
-            cekNotifikasiPengeluaran();
         }
+
+
 
         // Fungsi untuk menampilkan detail transaksi
         function tampilkanDetailTransaksi(id) {
@@ -479,13 +555,14 @@
             });
         }
 
-        // Fungsi untuk menampilkan daftar transaksi
+
+        // Fungsi untuk menampilkan daftar transaksi dengan pagination
         function renderTransaksi() {
             const transaksiListBody = daftarTransaksiTable.querySelector('tbody');
             transaksiListBody.innerHTML = '';
 
             const filterBulan = filterBulanInput.value;
-            constfilterTahun = filterTahunInput.value;
+            const filterTahun = filterTahunInput.value;
             const filterKategori = filterKategoriInput.value.toLowerCase();
 
             let totalPendapatan = 0;
@@ -499,7 +576,7 @@
                 const kategoriTransaksi = transaksi.kategori.toLowerCase();
 
                 const cocokBulan = !filterBulan || bulanTransaksi === filterBulan;
-                const cocokTahun = !filterTahun || tahunTransaksi === tahunTransaksi; // Tambahkan ini
+                const cocokTahun = !filterTahun || tahunTransaksi === filterTahun; // Tambahkan ini
                 const cocokKategori = !filterKategori || kategoriTransaksi.includes(filterKategori);
 
                 return cocokBulan && cocokTahun && cocokKategori;
@@ -508,10 +585,16 @@
                 return new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime();
             });
 
+            const startIndex = (currentPage - 1) * recordsPerPage;
+            const endIndex = startIndex + recordsPerPage;
+            const transaksiHalamanIni = transaksiYangDifilter.slice(startIndex, endIndex);
+
             if (transaksiYangDifilter.length === 0) {
                 transaksiListBody.innerHTML = `<tr><td colspan="5" class="px-5 py-5 border-b border-gray-200 text-sm text-gray-500">Tidak ada transaksi yang sesuai dengan filter.</td></tr>`;
+                prevPageButton.disabled = true;
+                nextPageButton.disabled = true;
             } else {
-                transaksiYangDifilter.forEach(transaksi => {
+                transaksiHalamanIni.forEach(transaksi => {
                     const row = document.createElement('tr');
                     const tanggalFormatted = new Date(transaksi.tanggal).toLocaleDateString('id-ID', {
                         day: 'numeric',
@@ -547,6 +630,9 @@
                         tampilkanDetailTransaksi(id);
                     });
                 });
+
+                prevPageButton.disabled = currentPage === 1;
+                nextPageButton.disabled = endIndex >= transaksiYangDifilter.length;
             }
 
             saldoAkhir = totalPendapatan - totalPengeluaran;
@@ -569,7 +655,7 @@
                 const filterTahun = filterTahunInput.value;
                 const filterKategori = filterKategoriInput.value.toLowerCase();
 
-                const cocokBulan = !filterBulan || bulanTransaksi === bulanTransaksi;
+                const cocokBulan = !filterBulan || bulanTransaksi === filterBulan;
                 const cocokTahun = !filterTahun || tahunTransaksi === tahunTransaksi;
                 const cocokKategori = !filterKategori || kategoriTransaksi.includes(filterKategori);
 
@@ -671,33 +757,6 @@
             }
         }
 
-        // Fungsi untuk memeriksa dan menampilkan notifikasi pengeluaran
-        function cekNotifikasiPengeluaran() {
-            const bulanIni = new Date().getMonth();
-            const tahunIni = new Date().getFullYear();
-            let totalPengeluaranBulanIni = 0;
-
-            transaksi.forEach(transaksi => {
-                const tanggalTransaksi = new Date(transaksi.tanggal);
-                if (tanggalTransaksi.getMonth() === bulanIni && tanggalTransaksi.getFullYear() === tahunIni && transaksi.jenis === 'pengeluaran') {
-                    totalPengeluaranBulanIni += transaksi.jumlah;
-                }
-            });
-
-            // Ambil batas pengeluaran dari localStorage, defaultnya 1 juta
-            const batasPengeluaran = parseFloat(localStorage.getItem('batasPengeluaran')) || 1000000;
-
-            if (totalPengeluaranBulanIni > batasPengeluaran) {
-                Swal.fire({
-                    title: 'Peringatan!',
-                    text: `Pengeluaran Anda bulan ${BULAN_DALAM_INDONESIA[bulanIni]} telah melebihi batas yang ditentukan (Rp ${batasPengeluaran.toLocaleString('id-ID')}).`,
-                    icon: 'warning',
-                    confirmButtonColor: '#f43f5e', // Tailwind red-500
-                    confirmButtonText: 'OK',
-                });
-            }
-        }
-
         // Inisialisasi aplikasi
         if (localStorage.getItem('isLoggedIn') === 'true') {
             isLoggedIn = true;
@@ -708,7 +767,6 @@
             }
             toggleSections();
             renderTransaksi();
-            cekNotifikasiPengeluaran(); // Cek notifikasi saat login
         } else {
             toggleSections();
         }
@@ -725,9 +783,9 @@
 
         // Event listeners
         tambahTransaksiButton.addEventListener('click', tambahTransaksi);
-        filterBulanInput.addEventListener('change', renderTransaksi);
-        filterTahunInput.addEventListener('change', renderTransaksi);
-        filterKategoriInput.addEventListener('input', renderTransaksi);
+        filterBulanInput.addEventListener('change', () => { currentPage = 1; renderTransaksi();});
+        filterTahunInput.addEventListener('change', () => { currentPage = 1; renderTransaksi();});
+        filterKategoriInput.addEventListener('input', () => { currentPage = 1; renderTransaksi();});
         document.getElementById('cetak-pdf').addEventListener('click', async () => {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
@@ -779,6 +837,23 @@
             doc.text(`Saldo Akhir: ${saldoAkhirElement.textContent}`, 10, y += 7);
 
             doc.save(`laporan-keuangan-${Date.now()}.pdf`);
+        });
+
+        // Event listener untuk tombol previous page
+        prevPageButton.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTransaksi();
+            }
+        });
+
+        // Event listener untuk tombol next page
+        nextPageButton.addEventListener('click', () => {
+            const totalPages = Math.ceil(transaksi.length / recordsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTransaksi();
+            }
         });
 
     </script>
