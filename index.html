@@ -490,7 +490,7 @@
             };
 
             transaksi.push(transaksiBaru);
-          let alertSudahMuncul = false;
+let alertSudahMuncul = false;
 
 if (jenis === 'pengeluaran' && jumlah > 500000) {
     alertSudahMuncul = true;
@@ -502,7 +502,6 @@ if (jenis === 'pengeluaran' && jumlah > 500000) {
     });
 }
 
-
             localStorage.setItem('transaksi-' + username, JSON.stringify(transaksi)); // Save transaksi
             renderTransaksi(); // Panggil renderTransaksi setelah menambah transaksi
 
@@ -511,6 +510,7 @@ if (jenis === 'pengeluaran' && jumlah > 500000) {
             kategoriInput.value = '';
             jumlahInput.value = '';
 
+            
 if (!alertSudahMuncul) {
     Swal.fire({
         icon: 'success',
@@ -521,6 +521,7 @@ if (!alertSudahMuncul) {
     });
 }
 
+        }
 
 
 
