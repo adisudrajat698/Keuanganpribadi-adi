@@ -9,7 +9,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Gaya CSS Kustom (jika diperlukan) */
         .transaksi-positif {
@@ -148,103 +147,12 @@
             border-color: #ddd;
         }
 
-        /* Dark mode styles */
-        .dark-mode {
-            background-color: #1a202c; /* Dark background */
-            color: #f7fafc; /* Light text */
-        }
-        .dark-mode .bg-gray-100 {
-            background-color: #2d3748; /* Darker gray for sections */
-        }
-        .dark-mode .bg-indigo-100 {
-             background-color: #4a5568;
-        }
-        .dark-mode .bg-yellow-100{
-            background-color: #4a5568;
-        }
-        .dark-mode .bg-green-100{
-            background-color: #4a5568;
-        }
-         .dark-mode .bg-red-100{
-            background-color: #4a5568;
-        }
-
-        .dark-mode .text-gray-700 {
-            color: #cbd5e0; /* Lighter gray text */
-        }
-        .dark-mode .text-indigo-700 {
-            color: #a78bfa; /* Lighter indigo */
-        }
-        .dark-mode .text-yellow-700 {
-            color: #f6e05e; /* Lighter yellow */
-        }
-        .dark-mode .text-green-700 {
-            color: #48bb78; /* Lighter green */
-        }
-        .dark-mode .text-red-700{
-            color: #f56565;
-        }
-
-        .dark-mode .border-gray-200 {
-            border-color: #4a5568; /* Darker border color */
-        }
-        .dark-mode .bg-white {
-            background-color: #2d3748; /* Darker background for tables */
-        }
-        .dark-mode th {
-            background-color: #4a5568; /* Darker background for table headers */
-            color: #fff;
-        }
-        .dark-mode .shadow-md {
-             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Darker shadow */
-        }
-
-        .dark-mode input,
-        .dark-mode select,
-        .dark-mode textarea {
-            background-color: #4a5568; /* Dark background for form inputs */
-            color: #fff;
-            border-color: #718096; /* Darker border color for form inputs */
-        }
-        .dark-mode input:focus,
-        .dark-mode select:focus,
-        .dark-mode textarea:focus {
-            border-color: #a0aec0; /* Lighter border on focus */
-            box-shadow: 0 0 0 3px rgba(160, 174, 192, 0.2); /* Lighter shadow on focus */
-        }
-
-        .dark-mode .swal2-popup {
-            background-color: #2d3748 !important;
-            color: #fff !important;
-        }
-        .dark-mode .swal2-title {
-            color: #fff !important;
-        }
-        .dark-mode .swal2-content {
-            color: #cbd5e0 !important;
-        }
-        .dark-mode .swal2-confirm-button {
-            background-color: #48bb78 !important;
-            color: #fff !important;
-        }
-        .dark-mode .swal2-cancel-button {
-            background-color: #f56565 !important;
-            color: #fff !important;
-        }
-
     </style>
 </head>
 <body class="bg-gray-100 font-inter">
     <div class="container mx-auto p-6 bg-white rounded-lg shadow-md mt-10 fade-in">
-        <div class="flex justify-between items-center mb-4">
-            <div>
-                <h1 class="text-4xl font-bold text-center text-indigo-700 mb-2 icon-animation">💸 Aplikasi CADAS</h1>
-                <h3 class="text-xl font-medium text-center text-gray-600 mb-8">Catat Duit Adi Sudrajat</h3>
-            </div>
-            <button id="toggle-dark-mode" class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                <i class="fas fa-moon"></i> Dark Mode
-            </button>
-        </div>
+       <h1 class="text-4xl font-bold text-center text-indigo-700 mb-2 icon-animation">💸 Aplikasi CADAS</h1>
+        <h3 class="text-xl font-medium text-center text-gray-600 mb-8">Catat Duit Adi Sudrajat</h3>
 
         <div id="section-login" class="bg-gray-100 rounded-lg p-6 mb-8">
             <h2 class="text-2xl font-semibold text-gray-700 mb-4"><i class="fas fa-sign-in-alt mr-2"></i> Login</h2>
@@ -386,7 +294,6 @@
                 <i class="fas fa-history mr-1"></i>
                 <b>Motivasi:</b> "Setiap transaksi adalah bagian dari cerita keuangan Anda. Catat dengan baik!"
             </p>
-        </div>
 
         <div id="section-summary" class="bg-red-100 rounded-lg p-6 mb-8" style="display: none;">
             <h2 class="text-2xl font-semibold text-red-700 mb-4"><i class="fas fa-chart-pie mr-2"></i> Ringkasan</h2>
@@ -404,9 +311,6 @@
                     <p id="saldo-akhir" class="text-xl font-bold text-blue-600">Rp 0</p>
                 </div>
             </div>
-            <div class="chart-container mt-6">
-                <canvas id="pie-chart"></canvas>
-            </div>
             <p class="mt-4 text-gray-600 text-sm">
                 <i class="fas fa-chart-line mr-1"></i>
                 <b>Motivasi:</b> "Ringkasan ini membantu Anda melihat gambaran besar keuangan Anda."
@@ -423,7 +327,7 @@
             </p>
         </div>
     </div>
- <footer class="copyright dark:bg-gray-800 dark:text-white py-4 text-center">
+ <footer class="copyright">
         &copy; 2024 Adi Sudrajat. All rights reserved.
     </footer>
 
@@ -435,7 +339,6 @@
         let selectedTransaksiId = null;
         let currentPage = 1;
         const recordsPerPage = 5; // Jumlah transaksi per halaman
-        let isDarkMode = false;
 
         // Mendapatkan elemen-elemen HTML
         const loginButton = document.getElementById('login-button');
@@ -450,7 +353,6 @@
         const cetPdfButton = document.getElementById('cetak-pdf');
         const prevPageButton = document.getElementById('prev-page');
         const nextPageButton = document.getElementById('next-page');
-        const darkModeButton = document.getElementById('toggle-dark-mode');
 
         const usernameInput = document.getElementById('username');
         const passwordInput = document.getElementById('password');
@@ -477,10 +379,6 @@
         const detailKategoriElement = document.getElementById('detail-kategori');
         const detailJumlahElement = document.getElementById('detail-jumlah');
         const hapusTransaksiButton = document.getElementById('hapus-transaksi');
-
-        // Chart element
-        const pieChartCanvas = document.getElementById('pie-chart').getContext('2d');
-        let pieChartInstance = null;
 
         // Fungsi untuk menampilkan atau menyembunyikan bagian-bagian aplikasi
         function toggleSections() {
@@ -678,7 +576,7 @@
                 const kategoriTransaksi = transaksi.kategori.toLowerCase();
 
                 const cocokBulan = !filterBulan || bulanTransaksi === filterBulan;
-                const cocokTahun = !filterTahun || tahunTransaksi === filterTahun; // Tambahkan ini
+                const cocokTahun = !filterTahun || tahunTransaksi === tahunTahun; // Tambahkan ini
                 const cocokKategori = !filterKategori || kategoriTransaksi.includes(filterKategori);
 
                 return cocokBulan && cocokTahun && cocokKategori;
@@ -743,70 +641,6 @@
             totalPendapatanElement.textContent = `Rp ${totalPendapatan.toLocaleString('id-ID')}`;
             totalPengeluaranElement.textContent = `Rp ${totalPengeluaran.toLocaleString('id-ID')}`;
             saldoAkhirElement.textContent = `Rp ${saldoAkhir.toLocaleString('id-ID')}`;
-
-            renderChart(totalPendapatan, totalPengeluaran);
-        }
-
-        function renderChart(totalPendapatan, totalPengeluaran) {
-            const data = {
-                labels: ['Pendapatan', 'Pengeluaran'],
-                datasets: [{
-                    label: 'Total',
-                    data: [totalPendapatan, totalPengeluaran],
-                    backgroundColor: [
-                        'rgba(56, 189, 248, 0.7)', // Tailwind sky-400
-                        'rgba(244, 114, 182, 0.7)' // Tailwind pink-400
-                    ],
-                    borderColor: [
-                        'rgba(56, 189, 248, 1)',
-                        'rgba(244, 114, 182, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            };
-
-            const options = {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            fontColor: isDarkMode ? '#fff' : '#333' // Set font color based on dark mode
-                        }
-                    },
-                    tooltip: {
-                        bodyFont: {
-                            fontColor: isDarkMode ? '#fff' : '#333'
-                        },
-                        titleFont: {
-                            fontColor: isDarkMode ? '#fff' : '#333'
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks: {
-                            color: isDarkMode ? '#fff' : '#333' // Set x-axis label color
-                        }
-                    },
-                    y: {
-                        ticks: {
-                            color: isDarkMode ? '#fff' : '#333' // Set y-axis label color
-                        }
-                    }
-                }
-            };
-
-            if (pieChartInstance) {
-                pieChartInstance.destroy();
-            }
-
-            pieChartInstance = new Chart(pieChartCanvas, {
-                type: 'pie',
-                data: data,
-                options: options
-            });
         }
 
         // Fungsi untuk mencetak laporan
@@ -923,37 +757,6 @@
             }
         }
 
-        // Event listener untuk tombol previous page
-        prevPageButton.addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                renderTransaksi();
-            }
-        });
-
-        // Event listener untuk tombol next page
-        nextPageButton.addEventListener('click', () => {
-            currentPage++;
-            renderTransaksi();
-        });
-
-        // Event listener untuk dark mode toggle
-        darkModeButton.addEventListener('click', () => {
-            isDarkMode = !isDarkMode;
-            document.body.classList.toggle('dark-mode', isDarkMode);
-            localStorage.setItem('darkMode', isDarkMode.toString());
-            const icon = darkModeButton.querySelector('i');
-
-            if (isDarkMode) {
-                icon.className = 'fas fa-sun';
-                darkModeButton.textContent = 'Light Mode';
-            } else {
-                icon.className = 'fas fa-moon';
-                darkModeButton.textContent = 'Dark Mode';
-            }
-            renderTransaksi();
-        });
-
         // Inisialisasi aplikasi
         if (localStorage.getItem('isLoggedIn') === 'true') {
             isLoggedIn = true;
@@ -966,15 +769,6 @@
             renderTransaksi();
         } else {
             toggleSections();
-        }
-
-        // Check for saved dark mode preference
-        if (localStorage.getItem('darkMode') === 'true') {
-            isDarkMode = true;
-            document.body.classList.add('dark-mode');
-            const icon = darkModeButton.querySelector('i');
-            icon.className = 'fas fa-sun';
-            darkModeButton.textContent = 'Light Mode';
         }
 
         // Generate tahun options
@@ -992,10 +786,76 @@
         filterBulanInput.addEventListener('change', () => { currentPage = 1; renderTransaksi();});
         filterTahunInput.addEventListener('change', () => { currentPage = 1; renderTransaksi();});
         filterKategoriInput.addEventListener('input', () => { currentPage = 1; renderTransaksi();});
-        document.getElementById('cetak-pdf').addEventListener('click', cetakLaporan);
+        document.getElementById('cetak-pdf').addEventListener('click', async () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
 
-        // Initial chart render
-        renderChart(0, 0);
+            let y = 10;
+            doc.setFontSize(14);
+            doc.text('Laporan Keuangan Pribadi', 105, y, { align: 'center' });
+
+            const filtered = transaksi.filter(transaksi => {
+                const tanggal = new Date(transaksi.tanggal);
+                const filterBulan = filterBulanInput.value;
+                const filterTahun = filterTahunInput.value;
+                const filterKategori = filterKategoriInput.value.toLowerCase();
+
+                return (!filterBulan || tanggal.getMonth().toString() === filterBulan) &&
+                    (!filterTahun || tanggal.getFullYear().toString() === filterTahun) &&
+                    (!filterKategori || transaksi.kategori.toLowerCase().includes(filterKategori));
+            });
+
+            if (filtered.length === 0) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Tidak Ada Data',
+                    text: 'Transaksi yang cocok tidak ditemukan.',
+                });
+                return;
+            }
+
+            y += 10;
+            doc.setFontSize(10);
+            doc.text('Tanggal      Jenis        Kategori            Jumlah', 10, y);
+            y += 5;
+            doc.line(10, y, 200, y);
+
+            filtered.forEach(t => {
+                y += 7;
+                const tanggal = new Date(t.tanggal).toLocaleDateString('id-ID');
+                const baris = `${tanggal.padEnd(12)} ${t.jenis.padEnd(10)} ${t.kategori.padEnd(18)} Rp ${t.jumlah.toLocaleString('id-ID')}`;
+                if (y > 270) {
+                    doc.addPage();
+                    y = 10;
+                }
+                doc.text(baris, 10, y);
+            });
+
+            y += 10;
+            doc.text(`Total Pendapatan: ${totalPendapatanElement.textContent}`, 10, y += 7);
+            doc.text(`Total Pengeluaran: ${totalPengeluaranElement.textContent}`, 10, y += 7);
+            doc.text(`Saldo Akhir: ${saldoAkhirElement.textContent}`, 10, y += 7);
+
+            doc.save(`laporan-keuangan-${Date.now()}.pdf`);
+        });
+
+        // Event listener untuk tombol previous page
+        prevPageButton.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTransaksi();
+            }
+        });
+
+        // Event listener untuk tombol next page
+        nextPageButton.addEventListener('click', () => {
+            const totalPages = Math.ceil(transaksi.length / recordsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTransaksi();
+            }
+        });
+
     </script>
 </body>
 </html>
