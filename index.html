@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Keuangan Pribadoy</title>
+    <title>Aplikasi Keuangan Pribadi</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@tailwindcss/browser@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -415,27 +415,6 @@
             transaksi.push(transaksiBaru);
             localStorage.setItem('transaksi-' + username, JSON.stringify(transaksi)); // Save transaksi
             renderTransaksi(); // Panggil renderTransaksi setelah menambah transaksi
-
-                // ✅ Cek apakah pengeluaran lebih besar dari pendapatan
-let totalPendapatan = 0;
-let totalPengeluaran = 0;
-
-transaksi.forEach(t => {
-    if (t.jenis === 'pendapatan') {
-        totalPendapatan += t.jumlah;
-    } else {
-        totalPengeluaran += t.jumlah;
-    }
-});
-
-if (totalPengeluaran > totalPendapatan) {
-    Swal.fire({
-        icon: 'warning',
-        title: 'Pengeluaran Melebihi Pendapatan!',
-        text: `Total pengeluaran (Rp ${totalPengeluaran.toLocaleString('id-ID')}) sudah melebihi pendapatan (Rp ${totalPendapatan.toLocaleString('id-ID')}). Ayo atur lagi keuanganmu!`
-    });
-}
-
 
             tanggalInput.value = '';
             jenisInput.value = 'pendapatan';
