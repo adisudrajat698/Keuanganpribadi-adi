@@ -656,7 +656,7 @@
                 const filterKategori = filterKategoriInput.value.toLowerCase();
 
                 const cocokBulan = !filterBulan || bulanTransaksi === filterBulan;
-                const cocokTahun = !filterTahun || tahunTransaksi === tahunTransaksi;
+                const cocokTahun = !filterTahun || tahunTransaksi === filterTahun;
                 const cocokKategori = !filterKategori || kategoriTransaksi.includes(filterKategori);
 
                 return cocokBulan && cocokTahun && cocokKategori;
