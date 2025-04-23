@@ -490,7 +490,10 @@
             };
 
             transaksi.push(transaksiBaru);
-            if (jenis === 'pengeluaran' && jumlah > 500000) {
+          let alertSudahMuncul = false;
+
+if (jenis === 'pengeluaran' && jumlah > 500000) {
+    alertSudahMuncul = true;
     Swal.fire({
         icon: 'warning',
         title: 'Pengeluaran Besar!',
@@ -498,6 +501,7 @@
         confirmButtonColor: '#d97706'
     });
 }
+
 
             localStorage.setItem('transaksi-' + username, JSON.stringify(transaksi)); // Save transaksi
             renderTransaksi(); // Panggil renderTransaksi setelah menambah transaksi
@@ -507,14 +511,16 @@
             kategoriInput.value = '';
             jumlahInput.value = '';
 
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: 'Transaksi Anda telah ditambahkan.',
-                timer: 1500,
-                showConfirmButton: false,
-            });
-        }
+if (!alertSudahMuncul) {
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: 'Transaksi Anda telah ditambahkan.',
+        timer: 1500,
+        showConfirmButton: false,
+    });
+}
+
 
 
 
