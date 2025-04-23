@@ -767,7 +767,6 @@
             }
             toggleSections();
             renderTransaksi();
-              cekPengeluaranBesarHariIni();
         } else {
             toggleSections();
         }
@@ -844,34 +843,6 @@
 
 
         // Event listener untuk tombol next page
-
-        function cekPengeluaranBesarHariIni() {
-    const today = new Date().toISOString().split('T')[0];
-    const keyReminder = `pengingat-${username}-${today}`;
-
-    if (localStorage.getItem(keyReminder)) return; // Sudah ditampilkan hari ini
-
-    const pengeluaranHariIni = transaksi.filter(t => 
-        t.jenis === 'pengeluaran' && t.tanggal === today
-    );
-
-    const totalHariIni = pengeluaranHariIni.reduce((acc, curr) => acc + curr.jumlah, 0);
-
-    if (totalHariIni >= 500000) {
-        Swal.fire({
-            icon: 'warning',
-            title: '⚠️ Pengeluaran Besar!',
-            html: `
-                Hari ini Anda telah mengeluarkan total <b>Rp ${totalHariIni.toLocaleString('id-ID')}</b>.<br>
-                Pertimbangkan kembali pengeluaran Anda. 😬
-            `,
-            confirmButtonText: 'Oke, saya mengerti!',
-        });
-
-        localStorage.setItem(keyReminder, 'true'); // Supaya nggak muncul dua kali
-    }
-}
-
       
     </script>
 </body>
