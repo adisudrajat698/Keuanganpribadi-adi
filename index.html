@@ -347,6 +347,7 @@
                 }
                 toggleSections();
                 renderTransaksi();
+                tampilkanNotifikasiBulanIni(); 
                 Swal.fire({
                     icon: 'success',
                     title: 'Berhasil!',
@@ -674,6 +675,43 @@
         }
 
         // Inisialisasi aplikasi
+
+        function tampilkanNotifikasiBulanIni() {
+    const sekarang = new Date();
+    const bulanIni = sekarang.getMonth();
+    const tahunIni = sekarang.getFullYear();
+
+    let totalPendapatan = 0;
+    let totalPengeluaran = 0;
+
+    transaksi.forEach(t => {
+        const tanggal = new Date(t.tanggal);
+        if (tanggal.getMonth() === bulanIni && tanggal.getFullYear() === tahunIni) {
+            if (t.jenis === 'pendapatan') {
+                totalPendapatan += t.jumlah;
+            } else {
+                totalPengeluaran += t.jumlah;
+            }
+        }
+    });
+
+    const saldoBulanIni = totalPendapatan - totalPengeluaran;
+
+    if (totalPengeluaran > 2000000) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Pengeluaran Tinggi!',
+            text: `Pengeluaranmu bulan ini sudah Rp ${totalPengeluaran.toLocaleString('id-ID')}. Ayo lebih hemat!`
+        });
+    } else if (saldoBulanIni > 1000000) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Hebat!',
+            text: `Kamu berhasil menabung Rp ${saldoBulanIni.toLocaleString('id-ID')} bulan ini!`
+        });
+    }
+}
+
         if (localStorage.getItem('isLoggedIn') === 'true') {
             isLoggedIn = true;
             username = localStorage.getItem('username');
