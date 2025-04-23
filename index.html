@@ -490,6 +490,15 @@
             };
 
             transaksi.push(transaksiBaru);
+            if (jenis === 'pengeluaran' && jumlah > 500000) {
+    Swal.fire({
+        icon: 'warning',
+        title: 'Pengeluaran Besar!',
+        html: `Pengeluaran untuk kategori <strong>${kategori}</strong> sebesar <strong>Rp ${jumlah.toLocaleString('id-ID')}</strong> melebihi Rp 500.000.`,
+        confirmButtonColor: '#d97706'
+    });
+}
+
             localStorage.setItem('transaksi-' + username, JSON.stringify(transaksi)); // Save transaksi
             renderTransaksi(); // Panggil renderTransaksi setelah menambah transaksi
 
