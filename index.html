@@ -8,6 +8,10 @@
     <script src="https://unpkg.com/@tailwindcss/browser@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         /* Gaya CSS Kustom (jika diperlukan) */
@@ -357,6 +361,21 @@
     </footer>
 
     <script>
+ const firebaseConfig = {
+        apiKey: "AIzaSyDvf_Rg89uX9ODamiUjTCZ-ZTIYA2C7a7w",
+        authDomain: "keuanganadi.firebaseapp.com",
+        projectId: "keuanganadi",
+        storageBucket: "keuanganadi.firebasestorage.app",
+        messagingSenderId: "829317955644",
+        appId: "1:829317955644:web:ecd350db338c02ab0fc339",
+        measurementId: "G-WDNBRP6DB5"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+        
         // Data transaksi (sementara, akan disimpan di localStorage setelah login)
         let transaksi = [];
         let isLoggedIn = false;
@@ -431,69 +450,76 @@
         }
 
         // Event listener untuk tombol login
-        loginButton.addEventListener('click', () => {
-            const enteredUsername = usernameInput.value;
+       loginButton.addEventListener('click', () => {
+            const enteredEmail = usernameInput.value; // Use email input
             const enteredPassword = passwordInput.value;
 
-            if (enteredUsername === 'adi' && enteredPassword === 'adi') {
-                isLoggedIn = true;
-                username = enteredUsername;
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('username', username);
-                // Load transaksi from localStorage
-                const storedTransaksi = localStorage.getItem('transaksi-' + username);
-                if (storedTransaksi) {
-                    transaksi = JSON.parse(storedTransaksi);
-                }
-                toggleSections();
-                renderTransaksi();
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: 'Anda berhasil login.',
-                    timer: 1500,
-                    showConfirmButton: false,
+            auth.signInWithEmailAndPassword(enteredEmail, enteredPassword)
+                .then((userCredential) => {
+                    // Signed in
+                    const user = userCredential.user;
+                    isLoggedIn = true;
+                    username = user.email; // Gunakan email sebagai username
+                    toggleSections();
+                    renderTransaksi();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Anda berhasil login.',
+                        timer: 1500,
+                        showConfirmButton: false,
+                    });
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    console.error("Login Error:", errorCode, errorMessage);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: 'Email atau password salah.',
+                    });
+                    errorMessage.textContent = 'Email atau password salah.';
+                    errorMessage.style.display = 'block';
                 });
-            } else {
-                errorMessage.textContent = 'Username atau password salah.';
-                errorMessage.style.display = 'block';
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal!',
-                    text: 'Username atau password salah.',
-                });
-            }
+
             usernameInput.value = '';
             passwordInput.value = '';
         });
 
         // Event listener untuk tombol logout
         logoutButton.addEventListener('click', () => {
-            isLoggedIn = false;
-            username = "";
-            localStorage.setItem('isLoggedIn', 'false');
-            localStorage.removeItem('username');
-             // Clear transaksi from localStorage
-            localStorage.removeItem('transaksi-' + username);
-            transaksi = [];
-            toggleSections();
-            renderTransaksi();
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: 'Anda berhasil logout.',
-                timer: 1500,
-                showConfirmButton: false,
+            auth.signOut().then(() => {
+                // Sign-out successful.
+                isLoggedIn = false;
+                username = "";
+                toggleSections();
+                transaksi = [];
+                renderTransaksi();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Anda berhasil logout.',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+            }).catch((error) => {
+                // An error happened.
+                console.error("Logout Error", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: 'Gagal logout.',
+                });
             });
         });
 
         // Fungsi untuk menambahkan transaksi baru
-        function tambahTransaksi() {
+      function tambahTransaksi() {
             const tanggal = tanggalInput.value;
             const jenis = jenisInput.value;
             const kategori = kategoriInput.value;
             const jumlah = parseFloat(jumlahInput.value);
-
             if (!tanggal || !jenis || !kategori || isNaN(jumlah)) {
                 Swal.fire({
                     icon: 'error',
@@ -503,14 +529,38 @@
                 return;
             }
 
-            const transaksiBaru = {
-                id: Date.now(), // Tambahkan ID unik
+            // Add transaksi to Firestore
+            db.collection("users").doc(auth.currentUser.uid).collection("transactions").add({
                 tanggal,
                 jenis,
                 kategori,
                 jumlah,
                 timestamp: new Date().getTime()
-            };
+            })
+            .then((docRef) => {
+                console.log("Document written with ID: ", docRef.id);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Transaksi Anda telah ditambahkan.',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+                tanggalInput.value = '';
+                jenisInput.value = 'pendapatan';
+                kategoriInput.value = '';
+                jumlahInput.value = '';
+                renderTransaksi(); // Refresh the list
+            })
+            .catch((error) => {
+                console.error("Error adding document: ", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: 'Transaksi gagal ditambahkan.',
+                });
+            });
+        }
 
             transaksi.push(transaksiBaru);
 let alertSudahMuncul = false;
