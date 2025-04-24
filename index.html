@@ -158,8 +158,8 @@
             <h2 class="text-2xl font-semibold text-gray-700 mb-4"><i class="fas fa-sign-in-alt mr-2"></i> Login</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label for="username" class="block text-gray-700 text-sm font-bold mb-2">Username:</label>
-                    <input type="email" id="username" placeholder="Masukkan username" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+                    <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
+                    <input type="email" id="email" placeholder="Masukkan email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
                 </div>
                 <div>
                     <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password:</label>
@@ -180,7 +180,7 @@
 
 
 
-        
+
         <div id="section-logout" class="bg-gray-100 rounded-lg p-6 mb-8" style="display: none;">
             <h2 class="text-2xl font-semibold text-gray-700 mb-4"><i class="fas fa-sign-out-alt mr-2"></i> Logout</h2>
             <p class="text-gray-800 mb-4">Anda telah login. Klik tombol di bawah untuk logout.</p>
@@ -196,12 +196,6 @@
 
 
 
-
-
-
-
-
-
 <div class="text-right">
   <a href="https://portofolioadi.vercel.app" target="_blank">
        <p class="text-gray-800 mb-4">Silakan kunjungi website potofolio Anda</p>
@@ -210,7 +204,7 @@
     </button>
   </a>
 </div>
-            
+
         </div>
 
         <div id="section-saldo" class="bg-indigo-100 rounded-lg p-4 mb-6" style="display: none;">
@@ -346,24 +340,42 @@
             <button id="cetak-pdf" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline animated-button">
                 <i class="fas fa-print mr-2"></i> Cetak
             </button>
-             <p class="mt-4 text-gray-600 text-sm">
+            <p class="mt-4 text-gray-600 text-sm">
                 <i class="fas fa-file-pdf mr-1"></i>
                 <b>Pengingat:</b> Cetak laporan untuk dokumentasi fisik dan perencanaan di masa mendatang.
             </p>
         </div>
     </div>
- <footer class="copyright">
+
+    <footer class="copyright">
         &copy; 2024 Adi Sudrajat. All rights reserved.
     </footer>
 
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
     <script>
+        // Konfigurasi Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDvf_Rg89uX9ODamiUjTCZ-ZTIYA2C7a7w",
+            authDomain: "keuanganadi.firebaseapp.com",
+            projectId: "keuanganadi",
+            storageBucket: "keuanganadi.firebasestorage.app",
+            messagingSenderId: "829317955644",
+            appId: "1:829317955644:web:ecd350db338c02ab0fc339",
+            measurementId: "G-WDNBRP6DB5"
+        };
+
+        // Inisialisasi Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
         // Data transaksi (sementara, akan disimpan di localStorage setelah login)
         let transaksi = [];
         let isLoggedIn = false;
-        let username = "";
+        let userEmail = "";
         let selectedTransaksiId = null;
-    
         const recordsPerPage = 5; // Jumlah transaksi per halaman
+        let currentPage = 1;
 
         // Mendapatkan elemen-elemen HTML
         const loginButton = document.getElementById('login-button');
@@ -378,26 +390,21 @@
         const cetPdfButton = document.getElementById('cetak-pdf');
         const prevPageButton = document.getElementById('prev-page');
         const nextPageButton = document.getElementById('next-page');
-
-        const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const errorMessage = document.getElementById('error-message');
-
         const tanggalInput = document.getElementById('tanggal');
         const jenisInput = document.getElementById('jenis');
         const kategoriInput = document.getElementById('kategori');
         const jumlahInput = document.getElementById('jumlah');
         const tambahTransaksiButton = document.getElementById('tambah-transaksi');
-
         const totalSaldoElement = document.getElementById('total-saldo');
         const totalPendapatanElement = document.getElementById('total-pendapatan');
         const totalPengeluaranElement = document.getElementById('total-pengeluaran');
         const saldoAkhirElement = document.getElementById('saldo-akhir');
-
         const filterBulanInput = document.getElementById('filter-bulan');
         const filterTahunInput = document.getElementById('filter-tahun');
         const filterKategoriInput = document.getElementById('filter-kategori');
-
         const detailTransaksiDiv = document.getElementById('detail-transaksi');
         const detailTanggalElement = document.getElementById('detail-tanggal');
         const detailJenisElement = document.getElementById('detail-jenis');
@@ -432,63 +439,91 @@
 
         // Event listener untuk tombol login
         loginButton.addEventListener('click', () => {
-            const enteredUsername = usernameInput.value;
-            const enteredPassword = passwordInput.value;
+            const email = emailInput.value;
+            const password = passwordInput.value;
 
-            if (enteredUsername === 'adi' && enteredPassword === 'adi') {
-                isLoggedIn = true;
-                username = enteredUsername;
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('username', username);
-                // Load transaksi from localStorage
-                const storedTransaksi = localStorage.getItem('transaksi-' + username);
-                if (storedTransaksi) {
-                    transaksi = JSON.parse(storedTransaksi);
-                }
-                toggleSections();
-                renderTransaksi();
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: 'Anda berhasil login.',
-                    timer: 1500,
-                    showConfirmButton: false,
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Signed in
+                    const user = userCredential.user;
+                    userEmail = user.email;
+                    isLoggedIn = true;
+                    // Simpan data user ke localStorage
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('userEmail', userEmail);
+                    // Load transaksi dari localStorage
+                    loadTransaksiFromLocalStorage();
+                    updateTahunOptions();
+                    toggleSections();
+                    updateSaldo();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Login Berhasil!',
+                        text: `Selamat datang, ${userEmail}!`,
+                    });
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessageText = error.message;
+                    errorMessage.textContent = errorMessageText;
+                    errorMessage.style.display = 'block';
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Login Gagal!',
+                        text: errorMessageText,
+                    });
                 });
-            } else {
-                errorMessage.textContent = 'Username atau password salah.';
-                errorMessage.style.display = 'block';
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal!',
-                    text: 'Username atau password salah.',
-                });
-            }
-            usernameInput.value = '';
-            passwordInput.value = '';
         });
 
         // Event listener untuk tombol logout
         logoutButton.addEventListener('click', () => {
-            isLoggedIn = false;
-            username = "";
-            localStorage.setItem('isLoggedIn', 'false');
-            localStorage.removeItem('username');
-             // Clear transaksi from localStorage
-            localStorage.removeItem('transaksi-' + username);
-            transaksi = [];
-            toggleSections();
-            renderTransaksi();
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: 'Anda berhasil logout.',
-                timer: 1500,
-                showConfirmButton: false,
+            auth.signOut().then(() => {
+                // Sign-out successful.
+                isLoggedIn = false;
+                userEmail = "";
+                transaksi = [];
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('transaksi');
+                toggleSections();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Logout Berhasil!',
+                    text: 'Anda telah berhasil logout.',
+                });
+            }).catch((error) => {
+                // An error happened.
+                const errorMessageText = error.message;
+                 Swal.fire({
+                        icon: 'error',
+                        title: 'Logout Gagal!',
+                        text: errorMessageText,
+                    });
             });
+
         });
 
+        // Fungsi untuk menyimpan transaksi ke localStorage
+        function saveTransaksiToLocalStorage() {
+            if (isLoggedIn) {
+                localStorage.setItem('transaksi', JSON.stringify(transaksi));
+            }
+        }
+
+        // Fungsi untuk memuat transaksi dari localStorage
+        function loadTransaksiFromLocalStorage() {
+            if (isLoggedIn) {
+                const transaksiData = localStorage.getItem('transaksi');
+                if (transaksiData) {
+                    transaksi = JSON.parse(transaksiData);
+                } else {
+                    transaksi = [];
+                }
+            }
+        }
+
         // Fungsi untuk menambahkan transaksi baru
-        function tambahTransaksi() {
+        tambahTransaksiButton.addEventListener('click', () => {
             const tanggal = tanggalInput.value;
             const jenis = jenisInput.value;
             const kategori = kategoriInput.value;
@@ -497,445 +532,343 @@
             if (!tanggal || !jenis || !kategori || isNaN(jumlah)) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Oops...',
-                    text: 'Harap isi semua field dengan benar.',
+                    title: 'Input Tidak Valid!',
+                    text: 'Harap isi semua kolom dengan benar.',
                 });
                 return;
             }
 
             const transaksiBaru = {
-                id: Date.now(), // Tambahkan ID unik
-                tanggal,
-                jenis,
-                kategori,
-                jumlah,
-                timestamp: new Date().getTime()
+                id: Date.now(), // Gunakan timestamp sebagai ID unik
+                tanggal: tanggal,
+                jenis: jenis,
+                kategori: kategori,
+                jumlah: jumlah,
+                email: userEmail // Tambahkan email user yang sedang login
             };
 
             transaksi.push(transaksiBaru);
-let alertSudahMuncul = false;
+            saveTransaksiToLocalStorage();
+            updateTahunOptions();
+            updateSaldo();
+            renderTransaksi(currentPage); // Render halaman saat ini
+            clearForm();
 
-if (jenis === 'pengeluaran' && jumlah > 500000) {
-    alertSudahMuncul = true;
-    Swal.fire({
-        icon: 'warning',
-        title: 'Pengeluaran Besar!',
-        html: `Pengeluaran untuk kategori <strong>${kategori}</strong> sebesar <strong>Rp ${jumlah.toLocaleString('id-ID')}</strong> melebihi Rp 500.000.`,
-        confirmButtonColor: '#d97706'
-    });
-}
+            Swal.fire({
+                icon: 'success',
+                title: 'Transaksi Berhasil Ditambahkan!',
+                text: 'Data transaksi Anda telah disimpan.',
+            });
+        });
 
-            localStorage.setItem('transaksi-' + username, JSON.stringify(transaksi)); // Save transaksi
-            renderTransaksi(); // Panggil renderTransaksi setelah menambah transaksi
-
+        // Fungsi untuk membersihkan form setelah menambahkan transaksi
+        function clearForm() {
             tanggalInput.value = '';
             jenisInput.value = 'pendapatan';
             kategoriInput.value = '';
             jumlahInput.value = '';
-
-            
-if (!alertSudahMuncul) {
-    Swal.fire({
-        icon: 'success',
-        title: 'Berhasil!',
-        text: 'Transaksi Anda telah ditambahkan.',
-        timer: 1500,
-        showConfirmButton: false,
-    });
-}
-
         }
 
-
-
-        // Fungsi untuk menampilkan detail transaksi
-        function tampilkanDetailTransaksi(id) {
-            const transaksiDetail = transaksi.find(t => t.id === id);
-            if (transaksiDetail) {
-                selectedTransaksiId = id;
-
-                const tanggalFormatted = new Date(transaksiDetail.tanggal).toLocaleDateString('id-ID', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
-                });
-
-                Swal.fire({
-                    title: 'Detail Transaksi',
-                    html: `
-                        <p><strong>Tanggal:</strong> ${tanggalFormatted}</p>
-                        <p><strong>Jenis:</strong> ${transaksiDetail.jenis}</p>
-                        <p><strong>Kategori:</strong> ${transaksiDetail.kategori}</p>
-                        <p><strong>Jumlah:</strong> Rp ${transaksiDetail.jumlah.toLocaleString('id-ID')}</p>
-                    `,
-                    icon: 'info',
-                    showCancelButton: true,
-                    confirmButtonText: 'Hapus',
-                    cancelButtonText: 'Tutup',
-                    confirmButtonColor: '#e11d48',
-                    cancelButtonColor: '#3b82f6'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        hapusTransaksiById(selectedTransaksiId);
-                    }
-                });
-            }
-        }
-
-        // Event listener untuk tombol hapus transaksi
-        function hapusTransaksiById(id) {
-            transaksi = transaksi.filter(t => t.id !== id);
-            localStorage.setItem('transaksi-' + username, JSON.stringify(transaksi));
-            renderTransaksi();
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: 'Transaksi dihapus.',
-                timer: 1500,
-                showConfirmButton: false
-            });
-        }
-
-
-        // Fungsi untuk menampilkan daftar transaksi dengan pagination
-        function renderTransaksi() {
-            const transaksiListBody = daftarTransaksiTable.querySelector('tbody');
-            transaksiListBody.innerHTML = '';
-
-            const filterBulan = filterBulanInput.value;
-            const filterTahun = filterTahunInput.value;
-            const filterKategori = filterKategoriInput.value.toLowerCase();
-
+        // Fungsi untuk menghitung dan menampilkan saldo
+        function updateSaldo() {
             let totalPendapatan = 0;
             let totalPengeluaran = 0;
-            let saldoAkhir = 0;
 
-            const transaksiYangDifilter = transaksi.filter(transaksi =>{
-                const tanggalTransaksi = new Date(transaksi.tanggal);
-                const bulanTransaksi = tanggalTransaksi.getMonth().toString();
-                const tahunTransaksi = tanggalTransaksi.getFullYear().toString();
-                const kategoriTransaksi = transaksi.kategori.toLowerCase();
+             // Filter transaksi berdasarkan email user yang login
+            const userTransaksi = transaksi.filter(t => t.email === userEmail);
 
-                const cocokBulan = !filterBulan || bulanTransaksi === filterBulan;
-                const cocokTahun = !filterTahun || tahunTransaksi === filterTahun; // Tambahkan ini
-                const cocokKategori = !filterKategori || kategoriTransaksi.includes(filterKategori);
-
-                return cocokBulan && cocokTahun && cocokKategori;
-            }).sort((a, b) => {
-                // Urutkan berdasarkan timestamp, transaksi terbaru di atas
-                return new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime();
+            userTransaksi.forEach(transaksi => {
+                if (transaksi.jenis === 'pendapatan') {
+                    totalPendapatan += transaksi.jumlah;
+                } else {
+                    totalPengeluaran += transaksi.jumlah;
+                }
             });
 
-           const transaksiHalamanIni = transaksiYangDifilter;
+            const saldoAkhir = totalPendapatan - totalPengeluaran;
 
+            totalPendapatanElement.textContent = `Rp ${totalPendapatan.toLocaleString('id-ID')}`;
+            totalPengeluaranElement.textContent = `Rp ${totalPengeluaran.toLocaleString('id-ID')}`;
+            saldoAkhirElement.textContent = `Rp ${saldoAkhir.toLocaleString('id-ID')}`;
+            totalSaldoElement.textContent = `Rp ${saldoAkhir.toLocaleString('id-ID')}`;
+        }
 
-            if (transaksiYangDifilter.length === 0) {
-                transaksiListBody.innerHTML = `<tr><td colspan="5" class="px-5 py-5 border-b border-gray-200 text-sm text-gray-500">Tidak ada transaksi yang sesuai dengan filter.</td></tr>`;
+        // Fungsi untuk menampilkan daftar transaksi
+        function renderTransaksi(page) {
+            const startIndex = (page - 1) * recordsPerPage;
+            const endIndex = startIndex + recordsPerPage;
+
+             // Filter transaksi berdasarkan email user yang login
+             const userTransaksi = transaksi.filter(t => t.email === userEmail);
+            const transaksiYangAkanDitampilkan = userTransaksi; // Tidak perlu di-slice lagi, sudah difilter
+
+            daftarTransaksiTable.querySelector('tbody').innerHTML = ''; // Clear table
+
+            if (transaksiYangAkanDitampilkan.length === 0) {
+                daftarTransaksiTable.querySelector('tbody').innerHTML = '<tr><td colspan="5" class="px-5 py-5 border-b border-gray-200 text-sm">Tidak ada transaksi.</td></tr>';
                 prevPageButton.disabled = true;
                 nextPageButton.disabled = true;
             } else {
-                transaksiHalamanIni.forEach(transaksi => {
+                transaksiYangAkanDitampilkan.forEach(transaksi => {
                     const row = document.createElement('tr');
-                    const tanggalFormatted = new Date(transaksi.tanggal).toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric'
-                    });
-
+                    const tanggalFormatted = new Date(transaksi.tanggal).toLocaleDateString('id-ID');
                     row.innerHTML = `
                         <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="font-italic text-gray-800">${tanggalFormatted}</span></td>
-                        <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="font-semibold ${transaksi.jenis === 'pendapatan' ? 'transaksi-positif': 'transaksi-negatif'}">${transaksi.jenis}</span></td>
-                        <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="font-oblique font-sans text-purple-600">${transaksi.kategori}</span></td>
-                        <td class="px-5 py-5 border-b border-gray-200 text-sm text-right">Rp ${transaksi.jumlah.toLocaleString('id-ID')}</td>
-                        <td class="px-5 py-5 border-b border-gray-200 text-sm">
-                            <button class="lihat-detail bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline text-xs" data-id="${transaksi.id}">
+                        <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="${transaksi.jenis === 'pendapatan' ? 'transaksi-positif' : 'transaksi-negatif'} font-semibold">${transaksi.jenis}</span></td>
+                        <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="font-medium text-indigo-600">${transaksi.kategori}</span></td>
+                        <td class="px-5 py-5 border-b border-gray-200 text-right text-sm"><span class="font-bold text-gray-900">Rp ${transaksi.jumlah.toLocaleString('id-ID')}</span></td>
+                         <td class="px-5 py-5 border-b border-gray-200 text-sm">
+                            <button class="detail-button bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline text-xs mr-1" data-id="${transaksi.id}">
                                 <i class="fas fa-info-circle"></i> Detail
+                            </button>
+                            <button class="edit-button bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline text-xs mr-1" data-id="${transaksi.id}">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="delete-button bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline text-xs" data-id="${transaksi.id}">
+                                <i class="fas fa-trash-alt"></i> Hapus
                             </button>
                         </td>
                     `;
-                    transaksiListBody.appendChild(row);
-
-                    if (transaksi.jenis === 'pendapatan') {
-                        totalPendapatan += transaksi.jumlah;
-                    } else {
-                        totalPengeluaran += transaksi.jumlah;
-                    }
+                    daftarTransaksiTable.querySelector('tbody').appendChild(row);
                 });
 
-                // Tambahkan event listener untuk tombol "Detail" setelah ditambahkan ke DOM
-                const detailButtons = daftarTransaksiTable.querySelectorAll('.lihat-detail');
-                detailButtons.forEach(button => {
-                    button.addEventListener('click', () => {
-                        const id = parseInt(button.getAttribute('data-id'));
-                        tampilkanDetailTransaksi(id);
-                    });
-                });
-
-                
+                prevPageButton.disabled = page === 1;
+                nextPageButton.disabled = endIndex >= transaksiYangAkanDitampilkan.length;
             }
+        }
 
-            saldoAkhir = totalPendapatan - totalPengeluaran;
+        // Event listener untuk tombol "Detail"
+        daftarTransaksiTable.addEventListener('click', (event) => {
+            if (event.target.classList.contains('detail-button')) {
+                const transaksiId = parseInt(event.target.dataset.id);
+                const transaksiYangDipilih = transaksi.find(t => t.id === transaksiId && t.email === userEmail); //filter juga berdasarkan email
 
-            totalSaldoElement.textContent = `Rp ${saldoAkhir.toLocaleString('id-ID')}`;
+                if (transaksiYangDipilih) {
+                    selectedTransaksiId = transaksiId; // Simpan ID transaksi yang sedang dilihat
+                    detailTanggalElement.textContent = new Date(transaksiYangDipilih.tanggal).toLocaleDateString('id-ID');
+                    detailJenisElement.textContent = transaksiYangDipilih.jenis;
+                    detailKategoriElement.textContent = transaksiYangDipilih.kategori;
+                    detailJumlahElement.textContent = `Rp ${transaksiYangDipilih.jumlah.toLocaleString('id-ID')}`;
+                    // Tambahkan logika untuk menampilkan detail transaksi (misalnya, menggunakan modal)
+                    Swal.fire({
+                        title: 'Detail Transaksi',
+                        html: `<div class="detail-transaksi">
+                                    <p><strong>Tanggal:</strong> ${detailTanggalElement.textContent}</p>
+                                    <p><strong>Jenis:</strong> ${detailJenisElement.textContent}</p>
+                                    <p><strong>Kategori:</strong> ${detailKategoriElement.textContent}</p>
+                                    <p><strong>Jumlah:</strong> ${detailJumlahElement.textContent}</p>
+                                </div>`,
+                        showCloseButton: true,
+                        showCancelButton: true,
+                        confirmButtonText: 'Edit',
+                        cancelButtonText: 'Hapus',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Handle Edit
+                            handleEdit(transaksiId);
+                        } else if (result.dismiss === Swal.DismissReason.cancel) {
+                            // Handle Delete
+                            handleDelete(transaksiId);
+                        }
+                    });
+                }
+            }
+        });
+
+        function handleEdit(transaksiId) {
+             const transaksiYangDipilih = transaksi.find(t => t.id === transaksiId && t.email === userEmail);
+            if (transaksiYangDipilih) {
+                tanggalInput.value = transaksiYangDipilih.tanggal;
+                jenisInput.value = transaksiYangDipilih.jenis;
+                kategoriInput.value = transaksiYangDipilih.kategori;
+                jumlahInput.value = transaksiYangDipilih.jumlah;
+
+                // Hapus transaksi lama dari array
+                transaksi = transaksi.filter(t => t.id !== transaksiId);
+                saveTransaksiToLocalStorage();
+                renderTransaksi(currentPage);
+
+                 Swal.fire({
+                    icon: 'info',
+                    title: 'Silakan ubah data transaksi',
+                    text: 'Klik tombol Tambah Transaksi setelah mengubah data',
+                });
+            }
+        }
+
+        function handleDelete(transaksiId) {
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Anda tidak akan dapat mengembalikan transaksi ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    transaksi = transaksi.filter(t => t.id !== transaksiId && t.email !== userEmail);
+                    saveTransaksiToLocalStorage();
+                    updateSaldo();
+                    renderTransaksi(currentPage);
+                    Swal.fire(
+                        'Terhapus!',
+                        'Transaksi Anda telah dihapus.',
+                        'success'
+                    );
+                }
+            });
+        }
+
+        // Event listener untuk tombol "Hapus"
+        daftarTransaksiTable.addEventListener('click', (event) => {
+            if (event.target.classList.contains('delete-button')) {
+                const transaksiId = parseInt(event.target.dataset.id);
+                handleDelete(transaksiId);
+            }
+        });
+
+         // Event listener untuk tombol "Edit"
+        daftarTransaksiTable.addEventListener('click', (event) => {
+            if (event.target.classList.contains('edit-button')) {
+                const transaksiId = parseInt(event.target.dataset.id);
+                handleEdit(transaksiId);
+            }
+        });
+
+        // Fungsi untuk inisialisasi filter tahun
+        function updateTahunOptions() {
+            const tahunSet = new Set();
+             // Filter transaksi berdasarkan email user yang login
+            const userTransaksi = transaksi.filter(t => t.email === userEmail);
+            userTransaksi.forEach(transaksi => {
+                const tahun = new Date(transaksi.tanggal).getFullYear();
+                tahunSet.add(tahun);
+            });
+
+            filterTahunInput.innerHTML = '<option value="">Semua Tahun</option>'; // Clear existing options
+            const sortedTahun = Array.from(tahunSet).sort((a, b) => b - a); // Sort descending
+            sortedTahun.forEach(tahun => {
+                const option = document.createElement('option');
+                option.value = tahun;
+                option.textContent = tahun;
+                filterTahunInput.appendChild(option);
+            });
+        }
+
+        // Event listener untuk filter
+        filterBulanInput.addEventListener('change', () => {
+            currentPage = 1;
+            renderTransaksi(currentPage);
+        });
+        filterTahunInput.addEventListener('change', () => {
+            currentPage = 1;
+            renderTransaksi(currentPage);
+        });
+        filterKategoriInput.addEventListener('input', () => {
+            currentPage = 1;
+            renderTransaksi(currentPage);
+        });
+
+        // Fungsi untuk memfilter transaksi
+        function filterTransaksi() {
+            const bulan = filterBulanInput.value;
+            const tahun = filterTahunInput.value;
+            const kategori = filterKategoriInput.value.toLowerCase();
+
+            // Filter transaksi berdasarkan email user yang login
+            const userTransaksi = transaksi.filter(t => t.email === userEmail);
+
+            const filteredTransaksi = userTransaksi.filter(transaksi => {
+                const transaksiBulan = bulan === '' || new Date(transaksi.tanggal).getMonth() === parseInt(bulan);
+                const transaksiTahun = tahun === '' || new Date(transaksi.tanggal).getFullYear() === parseInt(tahun);
+                const transaksiKategori = kategori === '' || transaksi.kategori.toLowerCase().includes(kategori);
+                return transaksiBulan && transaksiTahun && transaksiKategori;
+            });
+            return filteredTransaksi;
+        }
+
+        // Event listener untuk cetak PDF
+        cetPdfButton.addEventListener('click', () => {
+            const doc = new jsPDF();
+            doc.text("Laporan Transaksi Keuangan", 10, 10);
+
+            const filteredTransaksi = filterTransaksi(); // Gunakan fungsi filterTransaksi
+
+            let y = 20;
+            filteredTransaksi.forEach(transaksi => {
+                const tanggal = new Date(transaksi.tanggal).toLocaleDateString('id-ID');
+                doc.text(`Tanggal: ${tanggal}, Jenis: ${transaksi.jenis}, Kategori: ${transaksi.kategori}, Jumlah: Rp ${transaksi.jumlah.toLocaleString('id-ID')}`, 10, y);
+                y += 10;
+            });
+
+            // Tambahkan ringkasan
+            doc.text(`Total Pendapatan: ${totalPendapatanElement.textContent}`, 10, y += 10);
+            doc.text(`Total Pengeluaran: ${totalPengeluaranElement.textContent}`, 10, y += 10);
+            doc.text(`Saldo Akhir: ${saldoAkhirElement.textContent}`, 10, y += 10);
+
+            doc.save('laporan-transaksi.pdf');
+        });
+
+        // Fungsi untuk menampilkan ringkasan transaksi
+        function updateSummary() {
+            let totalPendapatan = 0;
+            let totalPengeluaran = 0;
+
+             // Filter transaksi berdasarkan email user yang login
+            const userTransaksi = transaksi.filter(t => t.email === userEmail);
+            const filteredTransaksi = filterTransaksi(); // Gunakan hasil filter
+
+            filteredTransaksi.forEach(transaksi => { // Gunakan filteredTransaksi
+                if (transaksi.jenis === 'pendapatan') {
+                    totalPendapatan += transaksi.jumlah;
+                } else {
+                    totalPengeluaran += transaksi.jumlah;
+                }
+            });
+
+            const saldoAkhir = totalPendapatan - totalPengeluaran;
+
             totalPendapatanElement.textContent = `Rp ${totalPendapatan.toLocaleString('id-ID')}`;
             totalPengeluaranElement.textContent = `Rp ${totalPengeluaran.toLocaleString('id-ID')}`;
             saldoAkhirElement.textContent = `Rp ${saldoAkhir.toLocaleString('id-ID')}`;
         }
 
-        // Fungsi untuk mencetak laporan
-        function cetakLaporan() {
-            // Menyaring transaksi berdasarkan filter
-            const transaksiYangDifilter = transaksi.filter(transaksi => {
-                const tanggalTransaksi = new Date(transaksi.tanggal);
-                const bulanTransaksi = tanggalTransaksi.getMonth().toString();
-                const tahunTransaksi = tanggalTransaksi.getFullYear().toString();
-                const kategoriTransaksi = transaksi.kategori.toLowerCase();
-                const filterBulan = filterBulanInput.value;
-                const filterTahun = filterTahunInput.value;
-                const filterKategori = filterKategoriInput.value.toLowerCase();
-
-                const cocokBulan = !filterBulan || bulanTransaksi === filterBulan;
-                const cocokTahun = !filterTahun || tahunTransaksi === tahunTransaksi;
-                const cocokKategori = !filterKategori || kategoriTransaksi.includes(filterKategori);
-
-                return cocokBulan && cocokTahun && cocokKategori;
-            }).sort((a, b) =>  new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime());
-
-            // Membuat string HTML untuk tabel
-            let tableHTML = `
-                <h1 style="text-align:center; font-size: 18px; margin-bottom: 20px;">Laporan Keuangan Pribadi</h1>
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-                    <thead style="background-color: #f0f0f0;">
-                        <tr>
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Tanggal</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Jenis</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Kategori</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Jumlah</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            if (transaksiYangDifilter.length === 0) {
-                tableHTML += `
-                    <tr>
-                        <td colspan="4" style="border: 1px solid #ddd; padding: 8px; text-align: center;">Tidak ada transaksi yang sesuai dengan filter.</td>
-                    </tr>
-                `;
-            } else {
-                transaksiYangDifilter.forEach(transaksi => {
-                    const tanggalFormatted = new Date(transaksi.tanggal).toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric'
-                    });
-                    tableHTML += `
-                        <tr>
-                            <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">${tanggalFormatted}</td>
-                            <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">${transaksi.jenis}</td>
-                            <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">${transaksi.kategori}</td>
-                            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">Rp ${transaksi.jumlah.toLocaleString('id-ID')}</td>
-                        </tr>
-                    `;
-                });
+        // Event listener untuk pagination
+        prevPageButton.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTransaksi(currentPage);
             }
-
-            tableHTML += `
-                    </tbody>
-                </table>
-                <div style="margin-top: 20px; font-size: 14px;">
-                    <p><strong>Total Pendapatan:</strong> <span style="color: green;">${totalPendapatanElement.textContent}</span></p>
-                    <p><strong>Total Pengeluaran:</strong> <span style="color: red;">${totalPengeluaranElement.textContent}</span></p>
-                    <p><strong>Saldo Akhir:</strong> <span style="color: blue;">${saldoAkhirElement.textContent}</span></p>
-                </div>
-            `;
-
-            // Membuka jendela baru untuk mencetak
-            const printWindow = window.open('', '_blank');
-            if (printWindow) {
-                printWindow.document.open();
-                printWindow.document.write(`
-                    <html>
-                        <head>
-                            <title>Laporan Keuangan</title>
-                            <style>
-                                body {
-                                    font-family: 'Arial', sans-serif;
-                                    margin: 0;
-                                    padding: 0;
-                                }
-                                table {
-                                    width: 100%;
-                                    border-collapse: collapse;
-                                }
-                                th, td {
-                                    border: 1px solid #ddd;
-                                    padding: 8px;
-                                    text-align: left;
-                                }
-                                th {
-                                    background-color: #f0f0f0;
-                                }
-                                .transaksi-positif {
-                                    color: #16a34a; /* Tailwind green-600 */
-                                }
-                                .transaksi-negatif {
-                                    color: #dc2626; /* Tailwind red-600 */
-                                }
-                            </style>
-                        </head>
-                        <body>${tableHTML}</body>
-                    </html>
-                `);
-                printWindow.document.close();
-                printWindow.focus();
-                printWindow.print();
-                printWindow.close();
-            } else {
-                alert('Gagal membuka jendela cetak. Pastikan browser Anda mengizinkan pop-up.');
-            }
-        }
-
-        // Inisialisasi aplikasi
-        if (localStorage.getItem('isLoggedIn') === 'true') {
-            isLoggedIn = true;
-            username = localStorage.getItem('username');
-            const storedTransaksi = localStorage.getItem('transaksi-' + username);
-            if (storedTransaksi) {
-                transaksi = JSON.parse(storedTransaksi);
-            }
-            toggleSections();
-            renderTransaksi();
-        } else {
-            toggleSections();
-        }
-
-        // Generate tahun options
-        const tahunSelect = document.getElementById('filter-tahun');
-        const tahunTerakhir = new Date().getFullYear();
-        for (let i = tahunTerakhir; i >= 2020; i--) { // Misalnya, mulai dari tahun 2020
-            const option = document.createElement('option');
-            option.value = i;
-            option.textContent = i;
-            tahunSelect.appendChild(option);
-        }
-
-        // Event listeners
-        tambahTransaksiButton.addEventListener('click', tambahTransaksi);
-        filterBulanInput.addEventListener('change', () => { currentPage = 1; renderTransaksi();});
-        filterTahunInput.addEventListener('change', () => { currentPage = 1; renderTransaksi();});
-        filterKategoriInput.addEventListener('input', () => { currentPage = 1; renderTransaksi();});
-        document.getElementById('cetak-pdf').addEventListener('click', async () => {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            let y = 10;
-            doc.setFontSize(14);
-            doc.text('Laporan Keuangan Pribadi', 105, y, { align: 'center' });
-
-            const filtered = transaksi.filter(transaksi => {
-                const tanggal = new Date(transaksi.tanggal);
-                const filterBulan = filterBulanInput.value;
-                const filterTahun = filterTahunInput.value;
-                const filterKategori = filterKategoriInput.value.toLowerCase();
-
-                return (!filterBulan || tanggal.getMonth().toString() === filterBulan) &&
-                    (!filterTahun || tanggal.getFullYear().toString() === filterTahun) &&
-                    (!filterKategori || transaksi.kategori.toLowerCase().includes(filterKategori));
-            });
-
-            if (filtered.length === 0) {
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Tidak Ada Data',
-                    text: 'Transaksi yang cocok tidak ditemukan.',
-                });
-                return;
-            }
-
-            y += 10;
-            doc.setFontSize(10);
-            doc.text('Tanggal      Jenis        Kategori            Jumlah', 10, y);
-            y += 5;
-            doc.line(10, y, 200, y);
-
-            filtered.forEach(t => {
-                y += 7;
-                const tanggal = new Date(t.tanggal).toLocaleDateString('id-ID');
-                const baris = `${tanggal.padEnd(12)} ${t.jenis.padEnd(10)} ${t.kategori.padEnd(18)} Rp ${t.jumlah.toLocaleString('id-ID')}`;
-                if (y > 270) {
-                    doc.addPage();
-                    y = 10;
-                }
-                doc.text(baris, 10, y);
-            });
-
-            y += 10;
-            doc.text(`Total Pendapatan: ${totalPendapatanElement.textContent}`, 10, y += 7);
-            doc.text(`Total Pengeluaran: ${totalPengeluaranElement.textContent}`, 10, y += 7);
-            doc.text(`Saldo Akhir: ${saldoAkhirElement.textContent}`, 10, y += 7);
-
-            doc.save(`laporan-keuangan-${Date.now()}.pdf`);
         });
 
-        // Event listener untuk tombol previous page
+        nextPageButton.addEventListener('click', () => {
+            const totalPages = Math.ceil(transaksi.length / recordsPerPage); //hitung ulang totalPages
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTransaksi(currentPage);
+            }
+        });
 
+        // Fungsi inisialisasi
+        function init() {
+            // Cek apakah user sudah login
+            const storedIsLoggedIn = localStorage.getItem('isLoggedIn');
+            const storedUserEmail = localStorage.getItem('userEmail');
 
-        // Event listener untuk tombol next page
-      
+            if (storedIsLoggedIn === 'true' && storedUserEmail) {
+                isLoggedIn = true;
+                userEmail = storedUserEmail;
+                loadTransaksiFromLocalStorage();
+            }
+            toggleSections();
+            updateTahunOptions();
+            updateSaldo();
+            renderTransaksi(currentPage); //tampilkan page 1 saat pertama kali load
+        }
+
+        init(); // Panggil fungsi inisialisasi
     </script>
-
-        <script type="module">
-  // 🔥 IMPORT DARI CDN
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-  // 🔧 CONFIG FIREBASE KAMU (dari Firebase Console)
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyDvf_Rg89uX9ODamiUjTCZ-ZTIYA2C7a7w",
-  authDomain: "keuanganadi.firebaseapp.com",
-  projectId: "keuanganadi",
-  storageBucket: "keuanganadi.firebasestorage.app",
-  messagingSenderId: "829317955644",
-  appId: "1:829317955644:web:ecd350db338c02ab0fc339",
-  measurementId: "G-WDNBRP6DB5"
-};
-
-  // 🚀 INISIALISASI
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-  // 🎯 Contoh Login
-  document.getElementById("login-button").addEventListener("click", async () => {
-    const email = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      alert("Login berhasil!");
-    } catch (error) {
-      alert("Login gagal: " + error.message);
-    }
-  });
-
-  // ➕ Contoh Tambah Transaksi
-  document.getElementById("tambah-transaksi").addEventListener("click", async () => {
-    const data = {
-      tanggal: document.getElementById("tanggal").value,
-      jenis: document.getElementById("jenis").value,
-      kategori: document.getElementById("kategori").value,
-      jumlah: parseFloat(document.getElementById("jumlah").value)
-    };
-    try {
-      await addDoc(collection(db, "transaksi"), data);
-      alert("Transaksi ditambahkan!");
-    } catch (error) {
-      alert("Gagal nambah transaksi: " + error.message);
-    }
-  });
-</script>
-
 </body>
 </html>
