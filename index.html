@@ -8,13 +8,7 @@
     <script src="https://unpkg.com/@tailwindcss/browser@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Firebase App (the core Firebase SDK) -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<!-- Firebase Auth -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  
     <style>
         /* Gaya CSS Kustom (jika diperlukan) */
         .transaksi-positif {
@@ -164,8 +158,8 @@
             <h2 class="text-2xl font-semibold text-gray-700 mb-4"><i class="fas fa-sign-in-alt mr-2"></i> Login</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label for="email" class="block text-gray-700 text-sm font-bold mb-2">:</label>
-                    <input type="email" id="email" placeholder="Masukkan email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+                    <label for="username" class="block text-gray-700 text-sm font-bold mb-2">Username:</label>
+                    <input type="text" id="username" placeholder="Masukkan username" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
                 </div>
                 <div>
                     <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password:</label>
@@ -364,14 +358,7 @@
 
     <script>
         // Data transaksi (sementara, akan disimpan di localStorage setelah login)
-
-        <!-- Firebase App (the core Firebase SDK) -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<!-- Firebase Auth -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-
         let transaksi = [];
-        
         let isLoggedIn = false;
         let username = "";
         let selectedTransaksiId = null;
@@ -392,8 +379,7 @@
         const prevPageButton = document.getElementById('prev-page');
         const nextPageButton = document.getElementById('next-page');
 
-        const emailInput = document.getElementById('email');
-
+        const usernameInput = document.getElementById('username');
         const passwordInput = document.getElementById('password');
         const errorMessage = document.getElementById('error-message');
 
@@ -445,69 +431,61 @@
         }
 
         // Event listener untuk tombol login
- loginButton.addEventListener('click', () => {
-    const email = document.getElementById('email').value;
-    const password = passwordInput.value;
+        loginButton.addEventListener('click', () => {
+            const enteredUsername = usernameInput.value;
+            const enteredPassword = passwordInput.value;
 
-    firebase.auth().signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            isLoggedIn = true;
-            username = email; // pakai email sebagai ID user
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('username', username);
-            
-            const storedTransaksi = localStorage.getItem('transaksi-' + username);
-            if (storedTransaksi) {
-                transaksi = JSON.parse(storedTransaksi);
+            if (enteredUsername === 'adi' && enteredPassword === 'adi') {
+                isLoggedIn = true;
+                username = enteredUsername;
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('username', username);
+                // Load transaksi from localStorage
+                const storedTransaksi = localStorage.getItem('transaksi-' + username);
+                if (storedTransaksi) {
+                    transaksi = JSON.parse(storedTransaksi);
+                }
+                toggleSections();
+                renderTransaksi();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Anda berhasil login.',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+            } else {
+                errorMessage.textContent = 'Username atau password salah.';
+                errorMessage.style.display = 'block';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: 'Username atau password salah.',
+                });
             }
+            usernameInput.value = '';
+            passwordInput.value = '';
+        });
 
+        // Event listener untuk tombol logout
+        logoutButton.addEventListener('click', () => {
+            isLoggedIn = false;
+            username = "";
+            localStorage.setItem('isLoggedIn', 'false');
+            localStorage.removeItem('username');
+             // Clear transaksi from localStorage
+            localStorage.removeItem('transaksi-' + username);
+            transaksi = [];
             toggleSections();
             renderTransaksi();
-
             Swal.fire({
                 icon: 'success',
                 title: 'Berhasil!',
-                text: 'Login berhasil.',
+                text: 'Anda berhasil logout.',
                 timer: 1500,
                 showConfirmButton: false,
             });
-        })
-        .catch((error) => {
-            errorMessage.textContent = 'Email atau password salah.';
-            errorMessage.style.display = 'block';
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal!',
-                text: 'Email atau password salah.',
-            });
         });
-
-    // Reset input
-    document.getElementById('email').value = '';
-    passwordInput.value = '';
-});
-
-
-        // Event listener untuk tombol logout
-       logoutButton.addEventListener('click', () => {
-    firebase.auth().signOut().then(() => {
-        isLoggedIn = false;
-        username = "";
-        localStorage.setItem('isLoggedIn', 'false');
-        localStorage.removeItem('username');
-        transaksi = [];
-        toggleSections();
-        renderTransaksi();
-
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: 'Anda berhasil logout.',
-            timer: 1500,
-            showConfirmButton: false,
-        });
-    });
-});
 
         // Fungsi untuk menambahkan transaksi baru
         function tambahTransaksi() {
