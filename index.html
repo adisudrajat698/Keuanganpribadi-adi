@@ -8,10 +8,6 @@
     <script src="https://unpkg.com/@tailwindcss/browser@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         /* Gaya CSS Kustom (jika diperlukan) */
@@ -363,21 +359,6 @@
     <script>
         // Data transaksi (sementara, akan disimpan di localStorage setelah login)
         let transaksi = [];
-        // Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyDvf_Rg89uX9ODamiUjTCZ-ZTIYA2C7a7w",
-  authDomain: "keuanganadi.firebaseapp.com",
-  projectId: "keuanganadi",
-  storageBucket: "keuanganadi.firebasestorage.app",
-  messagingSenderId: "829317955644",
-  appId: "1:829317955644:web:ecd350db338c02ab0fc339",
-  measurementId: "G-WDNBRP6DB5"
-};
-
-// Inisialisasi Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
         let isLoggedIn = false;
         let username = "";
         let selectedTransaksiId = null;
@@ -505,38 +486,31 @@ const db = firebase.firestore();
                 showConfirmButton: false,
             });
         });
-function tambahTransaksi() {
-    const tanggal = tanggalInput.value;
-    const jenis = jenisInput.value;
-    const kategori = kategoriInput.value;
-    const jumlah = parseFloat(jumlahInput.value);
 
-    if (!tanggal || !jenis || !kategori || isNaN(jumlah)) {
-        Swal.fire({ icon: 'error', title: 'Oops...', text: 'Harap isi semua field dengan benar.' });
-        return;
-    }
+        // Fungsi untuk menambahkan transaksi baru
+        function tambahTransaksi() {
+            const tanggal = tanggalInput.value;
+            const jenis = jenisInput.value;
+            const kategori = kategoriInput.value;
+            const jumlah = parseFloat(jumlahInput.value);
 
-    const transaksiBaru = {
-        tanggal,
-        jenis,
-        kategori,
-        jumlah,
-        timestamp: new Date().getTime()
-    };
+            if (!tanggal || !jenis || !kategori || isNaN(jumlah)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Harap isi semua field dengan benar.',
+                });
+                return;
+            }
 
-    db.collection("transaksi").add(transaksiBaru).then(() => {
-        Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Transaksi disimpan ke database!', timer: 1500, showConfirmButton: false });
-        renderTransaksi(); // refresh tampilan
-    }).catch((error) => {
-        console.error("Error menambahkan transaksi: ", error);
-    });
-
-    tanggalInput.value = '';
-    jenisInput.value = 'pendapatan';
-    kategoriInput.value = '';
-    jumlahInput.value = '';
-}
-
+            const transaksiBaru = {
+                id: Date.now(), // Tambahkan ID unik
+                tanggal,
+                jenis,
+                kategori,
+                jumlah,
+                timestamp: new Date().getTime()
+            };
 
             transaksi.push(transaksiBaru);
 let alertSudahMuncul = false;
@@ -627,15 +601,6 @@ if (!alertSudahMuncul) {
         function renderTransaksi() {
             const transaksiListBody = daftarTransaksiTable.querySelector('tbody');
             transaksiListBody.innerHTML = '';
-
-                transaksi = [];
-
-    db.collection("transaksi").orderBy("timestamp", "desc").get().then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            data.id = doc.id;
-            transaksi.push(data);
-        });
 
             const filterBulan = filterBulanInput.value;
             const filterTahun = filterTahunInput.value;
