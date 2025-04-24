@@ -884,5 +884,58 @@ if (!alertSudahMuncul) {
         // Event listener untuk tombol next page
       
     </script>
+
+        <script type="module">
+  // 🔥 IMPORT DARI CDN
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // 🔧 CONFIG FIREBASE KAMU (dari Firebase Console)
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDvf_Rg89uX9ODamiUjTCZ-ZTIYA2C7a7w",
+  authDomain: "keuanganadi.firebaseapp.com",
+  projectId: "keuanganadi",
+  storageBucket: "keuanganadi.firebasestorage.app",
+  messagingSenderId: "829317955644",
+  appId: "1:829317955644:web:ecd350db338c02ab0fc339",
+  measurementId: "G-WDNBRP6DB5"
+};
+
+  // 🚀 INISIALISASI
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // 🎯 Contoh Login
+  document.getElementById("login-button").addEventListener("click", async () => {
+    const email = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      alert("Login berhasil!");
+    } catch (error) {
+      alert("Login gagal: " + error.message);
+    }
+  });
+
+  // ➕ Contoh Tambah Transaksi
+  document.getElementById("tambah-transaksi").addEventListener("click", async () => {
+    const data = {
+      tanggal: document.getElementById("tanggal").value,
+      jenis: document.getElementById("jenis").value,
+      kategori: document.getElementById("kategori").value,
+      jumlah: parseFloat(document.getElementById("jumlah").value)
+    };
+    try {
+      await addDoc(collection(db, "transaksi"), data);
+      alert("Transaksi ditambahkan!");
+    } catch (error) {
+      alert("Gagal nambah transaksi: " + error.message);
+    }
+  });
+</script>
+
 </body>
 </html>
