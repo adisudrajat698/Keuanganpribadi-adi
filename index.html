@@ -450,8 +450,8 @@
         }
 
         // Event listener untuk tombol login
-       loginButton.addEventListener('click', () => {
-            const enteredEmail = usernameInput.value; // Use email input
+      loginButton.addEventListener('click', () => {
+            const enteredEmail = usernameInput.value;  // Ini tetap benar, karena ini mengambil *nilai* dari input email
             const enteredPassword = passwordInput.value;
 
             auth.signInWithEmailAndPassword(enteredEmail, enteredPassword)
@@ -459,7 +459,7 @@
                     // Signed in
                     const user = userCredential.user;
                     isLoggedIn = true;
-                    username = user.email; // Gunakan email sebagai username
+                    username = user.email; // Gunakan email sebagai username (ini benar)
                     toggleSections();
                     renderTransaksi();
                     Swal.fire({
@@ -473,7 +473,7 @@
                 .catch((error) => {
                     const errorCode = error.code;
                     const errorMessage = error.message;
-                    console.error("Login Error:", errorCode, errorMessage);
+                    console.error("Firebase Login Error:", errorCode, errorMessage);
                     Swal.fire({
                         icon: 'error',
                         title: 'Gagal!',
