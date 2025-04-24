@@ -10,6 +10,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
@@ -358,6 +360,8 @@
 };
 
 firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
 
         // Data transaksi (sementara, akan disimpan di localStorage setelah login)
         let transaksi = [];
@@ -456,13 +460,18 @@ firebase.initializeApp(firebaseConfig);
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('email', email);
 
-    const storedTransaksi = localStorage.getItem('transaksi-' + email);
-    if (storedTransaksi) {
-      transaksi = JSON.parse(storedTransaksi);
-    }
+   db.collection("transaksi")
+  .where("user", "==", email)
+  .orderBy("timestamp", "desc")
+  .get()
+  .then(snapshot => {
+    transaksi = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderTransaksi();
+  });
+
 
     toggleSections();
-    renderTransaksi();
+
 
     Swal.fire({
       icon: 'success',
@@ -532,6 +541,11 @@ firebase.initializeApp(firebaseConfig);
 
             transaksi.push(transaksiBaru);
             localStorage.setItem('transaksi-' + email, JSON.stringify(transaksi)); // Save transaksi menggunakan email sebagai key
+            db.collection("transaksi").add({
+    ...transaksiBaru,
+    user: email
+});
+
             renderTransaksi(); // Panggil renderTransaksi setelah menambah transaksi
 
             tanggalInput.value = '';
