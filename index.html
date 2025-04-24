@@ -501,7 +501,7 @@ firebase.initializeApp(firebaseConfig);
             localStorage.setItem('isLoggedIn', 'false');
             localStorage.removeItem('email'); // Hapus email dari localStorage
              // Clear transaksi from localStorage
-            localStorage.removeItem('transaksi-' + email); // Gunakan email sebagai key
+            
             transaksi = [];
             toggleSections();
             renderTransaksi();
@@ -540,7 +540,7 @@ firebase.initializeApp(firebaseConfig);
             };
 
             transaksi.push(transaksiBaru);
-            localStorage.setItem('transaksi-' + email, JSON.stringify(transaksi)); // Save transaksi menggunakan email sebagai key
+            // Save transaksi menggunakan email sebagai key
             db.collection("transaksi").add({
     ...transaksiBaru,
     user: email
@@ -832,10 +832,15 @@ if (!alertSudahMuncul) {
         if (localStorage.getItem('isLoggedIn') === 'true') {
             isLoggedIn = true;
             email = localStorage.getItem('email'); // Load email dari localStorage
-            const storedTransaksi = localStorage.getItem('transaksi-' + email); // Gunakan email sebagai key
-            if (storedTransaksi) {
-                transaksi = JSON.parse(storedTransaksi);
-            }
+          db.collection("transaksi")
+  .where("user", "==", email)
+  .orderBy("timestamp", "desc")
+  .get()
+  .then(snapshot => {
+    transaksi = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderTransaksi();
+  });
+
             toggleSections();
             renderTransaksi();
         } else {
