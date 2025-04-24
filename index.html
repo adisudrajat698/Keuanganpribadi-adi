@@ -367,6 +367,25 @@ firebase.initializeApp(firebaseConfig);
         let transaksi = [];
         let isLoggedIn = false;
         let email = ""; // Mengganti username menjadi email
+
+        // Fungsi untuk ambil transaksi dari Firebase
+function ambilTransaksiDariFirebase() {
+  db.collection("transaksi")
+    .where("user", "==", email)
+    .orderBy("timestamp", "desc")
+    .get()
+    .then(snapshot => {
+      transaksi = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      renderTransaksi();
+    })
+    .catch(error => {
+      console.error("Gagal ambil data dari Firebase:", error);
+    });
+}
+
     
         const recordsPerPage = 5; // Jumlah transaksi per halaman
 
@@ -453,21 +472,16 @@ firebase.initializeApp(firebaseConfig);
                 return;
             }
 
-           firebase.auth().signInWithEmailAndPassword(enteredEmail, enteredPassword)
+          firebase.auth().signInWithEmailAndPassword(enteredEmail, enteredPassword)
   .then((userCredential) => {
     isLoggedIn = true;
     email = enteredEmail;
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('email', email);
 
-   db.collection("transaksi")
-  .where("user", "==", email)
-  .orderBy("timestamp", "desc")
-  .get()
-  .then(snapshot => {
-    transaksi = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    renderTransaksi();
-  });
+    toggleSections();
+    ambilTransaksiDariFirebase(); // 🆕 Taruh ini aja buat ambil dari Firebase
+
 
 
     toggleSections();
@@ -499,7 +513,7 @@ firebase.initializeApp(firebaseConfig);
             isLoggedIn = false;
             email = ""; // Reset email
             localStorage.setItem('isLoggedIn', 'false');
-            localStorage.removeItem('email'); // Hapus email dari localStorage
+         // Hapus email dari localStorage
              // Clear transaksi from localStorage
             
             transaksi = [];
@@ -617,7 +631,12 @@ if (!alertSudahMuncul) {
         // Event listener untuk tombol hapus transaksi
         function hapusTransaksiById(id) {
             transaksi = transaksi.filter(t => t.id !== id);
-            localStorage.setItem('transaksi-' + email, JSON.stringify(transaksi)); // Gunakan email sebagai key
+            transaksi.push(transaksiBaru);
+db.collection("transaksi").add({
+  ...transaksiBaru,
+  user: email
+});
+
             renderTransaksi();
             Swal.fire({
                 icon: 'success',
@@ -828,24 +847,15 @@ if (!alertSudahMuncul) {
             }
         }
 
-        // Inisialisasi aplikasi
-        if (localStorage.getItem('isLoggedIn') === 'true') {
-            isLoggedIn = true;
-            email = localStorage.getItem('email'); // Load email dari localStorage
-          db.collection("transaksi")
-  .where("user", "==", email)
-  .orderBy("timestamp", "desc")
-  .get()
-  .then(snapshot => {
-    transaksi = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    renderTransaksi();
-  });
+       if (localStorage.getItem('isLoggedIn') === 'true') {
+    isLoggedIn = true;
+    email = localStorage.getItem('email');
+    toggleSections();
+    ambilTransaksiDariFirebase(); // 🆕 Ambil data saat refresh halaman
+} else {
+    toggleSections();
+}
 
-            toggleSections();
-            renderTransaksi();
-        } else {
-            toggleSections();
-        }
 
         // Generate tahun options
         const tahunSelect = document.getElementById('filter-tahun');
