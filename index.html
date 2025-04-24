@@ -10,8 +10,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
@@ -360,15 +358,17 @@
 };
 
 firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
 
         // Data transaksi (sementara, akan disimpan di localStorage setelah login)
         let transaksi = [];
         let isLoggedIn = false;
         let email = ""; // Mengganti username menjadi email
+    
+        const recordsPerPage = 5; // Jumlah transaksi per halaman
 
-        // Fungsi untuk ambil transaksi dari Firebase
+        // Mendapatkan elemen-elemen HTML
+        const loginButton = document.getElementById('login-button');
+
 function ambilTransaksiDariFirebase() {
   db.collection("transaksi")
     .where("user", "==", email)
@@ -386,11 +386,6 @@ function ambilTransaksiDariFirebase() {
     });
 }
 
-    
-        const recordsPerPage = 5; // Jumlah transaksi per halaman
-
-        // Mendapatkan elemen-elemen HTML
-        const loginButton = document.getElementById('login-button');
         const logoutButton = document.getElementById('logout-button');
         const loginSection = document.getElementById('section-login');
         const logoutSection = document.getElementById('section-logout');
@@ -472,20 +467,17 @@ function ambilTransaksiDariFirebase() {
                 return;
             }
 
-          firebase.auth().signInWithEmailAndPassword(enteredEmail, enteredPassword)
+           firebase.auth().signInWithEmailAndPassword(enteredEmail, enteredPassword)
   .then((userCredential) => {
     isLoggedIn = true;
     email = enteredEmail;
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('email', email);
 
-    toggleSections();
-    ambilTransaksiDariFirebase(); // 🆕 Taruh ini aja buat ambil dari Firebase
-
-
+    
 
     toggleSections();
-
+    ambilTransaksiDariFirebase();
 
     Swal.fire({
       icon: 'success',
@@ -513,12 +505,11 @@ function ambilTransaksiDariFirebase() {
             isLoggedIn = false;
             email = ""; // Reset email
             localStorage.setItem('isLoggedIn', 'false');
-         // Hapus email dari localStorage
+            localStorage.removeItem('email'); // Hapus email dari localStorage
              // Clear transaksi from localStorage
-            
+             // Gunakan email sebagai key
             transaksi = [];
             toggleSections();
-            renderTransaksi();
             Swal.fire({
                 icon: 'success',
                 title: 'Berhasil!',
@@ -554,13 +545,7 @@ function ambilTransaksiDariFirebase() {
             };
 
             transaksi.push(transaksiBaru);
-            // Save transaksi menggunakan email sebagai key
-            db.collection("transaksi").add({
-    ...transaksiBaru,
-    user: email
-});
-
-            renderTransaksi(); // Panggil renderTransaksi setelah menambah transaksi
+             // Save transaksi menggunakan email sebagai key // Panggil renderTransaksi setelah menambah transaksi
 
             tanggalInput.value = '';
             jenisInput.value = 'pendapatan';
@@ -631,13 +616,7 @@ if (!alertSudahMuncul) {
         // Event listener untuk tombol hapus transaksi
         function hapusTransaksiById(id) {
             transaksi = transaksi.filter(t => t.id !== id);
-            transaksi.push(transaksiBaru);
-db.collection("transaksi").add({
-  ...transaksiBaru,
-  user: email
-});
-
-            renderTransaksi();
+             // Gunakan email sebagai key
             Swal.fire({
                 icon: 'success',
                 title: 'Berhasil!',
@@ -847,15 +826,18 @@ db.collection("transaksi").add({
             }
         }
 
-       if (localStorage.getItem('isLoggedIn') === 'true') {
-    isLoggedIn = true;
-    email = localStorage.getItem('email');
-    toggleSections();
-    ambilTransaksiDariFirebase(); // 🆕 Ambil data saat refresh halaman
-} else {
-    toggleSections();
-}
-
+        // Inisialisasi aplikasi
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            isLoggedIn = true;
+            email = localStorage.getItem('email'); // Load email dari localStorage
+            const storedTransaksi = localStorage.getItem('transaksi-' + email); // Gunakan email sebagai key
+            if (storedTransaksi) {
+                transaksi = JSON.parse(storedTransaksi);
+            }
+            toggleSections();
+        } else {
+            toggleSections();
+        }
 
         // Generate tahun options
         const tahunSelect = document.getElementById('filter-tahun');
@@ -869,9 +851,9 @@ db.collection("transaksi").add({
 
         // Event listeners
         tambahTransaksiButton.addEventListener('click', tambahTransaksi);
-        filterBulanInput.addEventListener('change', () => { currentPage = 1; renderTransaksi();});
-        filterTahunInput.addEventListener('change', () => { currentPage = 1; renderTransaksi();});
-        filterKategoriInput.addEventListener('input', () => { currentPage = 1; renderTransaksi();});
+        filterBulanInput.addEventListener('change', () => { currentPage = 1;});
+        filterTahunInput.addEventListener('change', () => { currentPage = 1;});
+        filterKategoriInput.addEventListener('input', () => { currentPage = 1;});
         document.getElementById('cetak-pdf').addEventListener('click', async () => {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
@@ -960,7 +942,6 @@ db.collection("transaksi").add({
         initializeTahun();
 
         // Panggil renderTransaksi saat halaman dimuat dan setiap kali filter berubah
-        renderTransaksi();
     </script>
 </body>
 </html>
