@@ -8,9 +8,6 @@
     <script src="https://unpkg.com/@tailwindcss/browser@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         /* Gaya CSS Kustom (jika diperlukan) */
@@ -161,8 +158,8 @@
             <h2 class="text-2xl font-semibold text-gray-700 mb-4"><i class="fas fa-sign-in-alt mr-2"></i> Login</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
-                    <input type="email" id="email" placeholder="Masukkan email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+                    <label for="username" class="block text-gray-700 text-sm font-bold mb-2">Username:</label>
+                    <input type="text" id="username" placeholder="Masukkan username" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
                 </div>
                 <div>
                     <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password:</label>
@@ -181,6 +178,9 @@
             </p>
         </div>
 
+
+
+        
         <div id="section-logout" class="bg-gray-100 rounded-lg p-6 mb-8" style="display: none;">
             <h2 class="text-2xl font-semibold text-gray-700 mb-4"><i class="fas fa-sign-out-alt mr-2"></i> Logout</h2>
             <p class="text-gray-800 mb-4">Anda telah login. Klik tombol di bawah untuk logout.</p>
@@ -191,6 +191,16 @@
                 <i class="fas fa-check-circle mr-1"></i>
                 <b>Motivasi:</b> "Setiap pengeluaran yang dicatat adalah langkah menuju kebebasan finansial."
             </p>
+
+
+
+
+
+
+
+
+
+
 
 <div class="text-right">
   <a href="https://portofolioadi.vercel.app" target="_blank">
@@ -347,22 +357,11 @@
     </footer>
 
     <script>
-        const firebaseConfig = {
-  apiKey: "AIzaSyDvf_Rg89uX9ODamiUjTCZ-ZTIYA2C7a7w",
-  authDomain: "keuanganadi.firebaseapp.com",
-  projectId: "keuanganadi",
-  storageBucket: "keuanganadi.firebasestorage.app",
-  messagingSenderId: "829317955644",
-  appId: "1:829317955644:web:ecd350db338c02ab0fc339",
-  measurementId: "G-WDNBRP6DB5"
-};
-
-firebase.initializeApp(firebaseConfig);
-
         // Data transaksi (sementara, akan disimpan di localStorage setelah login)
         let transaksi = [];
         let isLoggedIn = false;
-        let email = ""; // Mengganti username menjadi email
+        let username = "";
+        let selectedTransaksiId = null;
     
         const recordsPerPage = 5; // Jumlah transaksi per halaman
 
@@ -380,7 +379,7 @@ firebase.initializeApp(firebaseConfig);
         const prevPageButton = document.getElementById('prev-page');
         const nextPageButton = document.getElementById('next-page');
 
-        const emailInput = document.getElementById('email'); // Mengganti usernameInput menjadi emailInput
+        const usernameInput = document.getElementById('username');
         const passwordInput = document.getElementById('password');
         const errorMessage = document.getElementById('error-message');
 
@@ -433,66 +432,49 @@ firebase.initializeApp(firebaseConfig);
 
         // Event listener untuk tombol login
         loginButton.addEventListener('click', () => {
-            const enteredEmail = emailInput.value; // Mengganti enteredUsername menjadi enteredEmail
+            const enteredUsername = usernameInput.value;
             const enteredPassword = passwordInput.value;
 
-            // Validasi email
-            const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
-            if (!emailRegex.test(enteredEmail)) {
-                errorMessage.textContent = 'Email tidak valid.';
+            if (enteredUsername === 'adi' && enteredPassword === 'adi') {
+                isLoggedIn = true;
+                username = enteredUsername;
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('username', username);
+                // Load transaksi from localStorage
+                const storedTransaksi = localStorage.getItem('transaksi-' + username);
+                if (storedTransaksi) {
+                    transaksi = JSON.parse(storedTransaksi);
+                }
+                toggleSections();
+                renderTransaksi();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Anda berhasil login.',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+            } else {
+                errorMessage.textContent = 'Username atau password salah.';
                 errorMessage.style.display = 'block';
                 Swal.fire({
                     icon: 'error',
                     title: 'Gagal!',
-                    text: 'Email tidak valid.',
+                    text: 'Username atau password salah.',
                 });
-                return;
             }
-
-           firebase.auth().signInWithEmailAndPassword(enteredEmail, enteredPassword)
-  .then((userCredential) => {
-    isLoggedIn = true;
-    email = enteredEmail;
-    localStorage.setItem('isLoggedIn', 'true');
-    localStorage.setItem('email', email);
-
-    const storedTransaksi = localStorage.getItem('transaksi-' + email);
-    if (storedTransaksi) {
-      transaksi = JSON.parse(storedTransaksi);
-    }
-
-    toggleSections();
-    renderTransaksi();
-
-    Swal.fire({
-      icon: 'success',
-      title: 'Berhasil!',
-      text: 'Anda berhasil login.',
-      timer: 1500,
-      showConfirmButton: false,
-    });
-  })
-  .catch((error) => {
-    errorMessage.textContent = 'Email atau password salah.';
-    errorMessage.style.display = 'block';
-
-    Swal.fire({
-      icon: 'error',
-      title: 'Gagal!',
-      text: 'Email atau password salah.',
-    });
-  });
-
+            usernameInput.value = '';
+            passwordInput.value = '';
         });
 
         // Event listener untuk tombol logout
         logoutButton.addEventListener('click', () => {
             isLoggedIn = false;
-            email = ""; // Reset email
+            username = "";
             localStorage.setItem('isLoggedIn', 'false');
-            localStorage.removeItem('email'); // Hapus email dari localStorage
+            localStorage.removeItem('username');
              // Clear transaksi from localStorage
-            localStorage.removeItem('transaksi-' + email); // Gunakan email sebagai key
+            localStorage.removeItem('transaksi-' + username);
             transaksi = [];
             toggleSections();
             renderTransaksi();
@@ -531,15 +513,7 @@ firebase.initializeApp(firebaseConfig);
             };
 
             transaksi.push(transaksiBaru);
-            localStorage.setItem('transaksi-' + email, JSON.stringify(transaksi)); // Save transaksi menggunakan email sebagai key
-            renderTransaksi(); // Panggil renderTransaksi setelah menambah transaksi
-
-            tanggalInput.value = '';
-            jenisInput.value = 'pendapatan';
-            kategoriInput.value = '';
-            jumlahInput.value = '';
-
-            let alertSudahMuncul = false;
+let alertSudahMuncul = false;
 
 if (jenis === 'pengeluaran' && jumlah > 500000) {
     alertSudahMuncul = true;
@@ -550,6 +524,14 @@ if (jenis === 'pengeluaran' && jumlah > 500000) {
         confirmButtonColor: '#d97706'
     });
 }
+
+            localStorage.setItem('transaksi-' + username, JSON.stringify(transaksi)); // Save transaksi
+            renderTransaksi(); // Panggil renderTransaksi setelah menambah transaksi
+
+            tanggalInput.value = '';
+            jenisInput.value = 'pendapatan';
+            kategoriInput.value = '';
+            jumlahInput.value = '';
 
             
 if (!alertSudahMuncul) {
@@ -603,7 +585,7 @@ if (!alertSudahMuncul) {
         // Event listener untuk tombol hapus transaksi
         function hapusTransaksiById(id) {
             transaksi = transaksi.filter(t => t.id !== id);
-            localStorage.setItem('transaksi-' + email, JSON.stringify(transaksi)); // Gunakan email sebagai key
+            localStorage.setItem('transaksi-' + username, JSON.stringify(transaksi));
             renderTransaksi();
             Swal.fire({
                 icon: 'success',
@@ -635,7 +617,7 @@ if (!alertSudahMuncul) {
                 const kategoriTransaksi = transaksi.kategori.toLowerCase();
 
                 const cocokBulan = !filterBulan || bulanTransaksi === filterBulan;
-                const cocokTahun = !filterTahun || tahunTransaksi === tahunTahun; // Tambahkan ini
+                const cocokTahun = !filterTahun || tahunTransaksi === filterTahun; // Tambahkan ini
                 const cocokKategori = !filterKategori || kategoriTransaksi.includes(filterKategori);
 
                 return cocokBulan && cocokTahun && cocokKategori;
@@ -713,7 +695,7 @@ if (!alertSudahMuncul) {
                 const filterKategori = filterKategoriInput.value.toLowerCase();
 
                 const cocokBulan = !filterBulan || bulanTransaksi === filterBulan;
-                const cocokTahun = !filterTahun || tahunTransaksi === tahunTahun;
+                const cocokTahun = !filterTahun || tahunTransaksi === tahunTransaksi;
                 const cocokKategori = !filterKategori || kategoriTransaksi.includes(filterKategori);
 
                 return cocokBulan && cocokTahun && cocokKategori;
@@ -817,8 +799,8 @@ if (!alertSudahMuncul) {
         // Inisialisasi aplikasi
         if (localStorage.getItem('isLoggedIn') === 'true') {
             isLoggedIn = true;
-            email = localStorage.getItem('email'); // Load email dari localStorage
-            const storedTransaksi = localStorage.getItem('transaksi-' + email); // Gunakan email sebagai key
+            username = localStorage.getItem('username');
+            const storedTransaksi = localStorage.getItem('transaksi-' + username);
             if (storedTransaksi) {
                 transaksi = JSON.parse(storedTransaksi);
             }
@@ -844,94 +826,63 @@ if (!alertSudahMuncul) {
         filterTahunInput.addEventListener('change', () => { currentPage = 1; renderTransaksi();});
         filterKategoriInput.addEventListener('input', () => { currentPage = 1; renderTransaksi();});
         document.getElementById('cetak-pdf').addEventListener('click', async () => {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
 
-  let y = 10;
-  doc.setFontSize(14);
-  doc.text('Laporan Keuangan Pribadi', 105, y, { align: 'center' });
+            let y = 10;
+            doc.setFontSize(14);
+            doc.text('Laporan Keuangan Pribadi', 105, y, { align: 'center' });
 
-  const filtered = transaksi.filter(transaksi => {
-    const tanggal = new Date(transaksi.tanggal);
-    const filterBulan = filterBulanInput.value;
-    const filterTahun = filterTahunInput.value;
-    const kategoriTransaksi = transaksi.kategori.toLowerCase();
+            const filtered = transaksi.filter(transaksi => {
+                const tanggal = new Date(transaksi.tanggal);
+                const filterBulan = filterBulanInput.value;
+                const filterTahun = filterTahunInput.value;
+                const filterKategori = filterKategoriInput.value.toLowerCase();
 
-    const cocokBulan = !filterBulan || tanggal.getMonth().toString() === filterBulan;
-    const cocokTahun = !filterTahun || tanggal.getFullYear().toString() === filterTahun;
-    const cocokKategori = !filterKategori || kategoriTransaksi.includes(filterKategoriInput.toLowerCase());
+                return (!filterBulan || tanggal.getMonth().toString() === filterBulan) &&
+                    (!filterTahun || tanggal.getFullYear().toString() === filterTahun) &&
+                    (!filterKategori || transaksi.kategori.toLowerCase().includes(filterKategori));
+            });
 
-    return cocokBulan && cocokTahun && cocokKategori;
-  }).sort((a, b) => new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime());
-
-
-  if (filtered.length === 0) {
-    Swal.fire({
-      icon: 'info',
-      title: 'Tidak Ada Data',
-      text: 'Tidak ada transaksi yang sesuai dengan filter.',
-    });
-    return;
-  }
-
-  y += 10;
-  doc.setFontSize(10);
-  doc.text('Tanggal      Jenis        Kategori            Jumlah', 10, y);
-  y += 5;
-  doc.line(10, y, 200, y);
-
-  let totalPendapatan = 0;
-  let totalPengeluaran = 0;
-
-  filtered.forEach(t => {
-    y += 7;
-    const tanggal = new Date(t.tanggal).toLocaleDateString('id-ID');
-    const jumlahFormatted = t.jumlah.toLocaleString('id-ID');
-    const baris = `${tanggal.padEnd(12)} ${t.jenis.padEnd(10)} ${t.kategori.padEnd(18)} Rp ${jumlahFormatted}`;
-    if (y > 270) {
-      doc.addPage();
-      y = 10;
-    }
-    doc.text(baris, 10, y);
-
-    if (t.jenis === 'pendapatan') {
-      totalPendapatan += t.jumlah;
-    } else {
-      totalPengeluaran += t.jumlah;
-    }
-  });
-
-  y += 10;
-  doc.text(`Total Pendapatan: Rp ${totalPendapatan.toLocaleString('id-ID')}`, 10, y += 7);
-  doc.text(`Total Pengeluaran: Rp ${totalPengeluaran.toLocaleString('id-ID')}`, 10, y += 7);
-  doc.text(`Saldo Akhir: Rp ${(totalPendapatan - totalPengeluaran).toLocaleString('id-ID')}`, 10, y += 7);
-
-
-  doc.save('Laporan Keuangan.pdf');
-});
-
-
-        // Tambahkan event listener untuk filter bulan, tahun, dan kategori
-        filterBulanInput.addEventListener('change', renderTransaksi);
-        filterTahunInput.addEventListener('change', renderTransaksi);
-        filterKategoriInput.addEventListener('input', renderTransaksi);
-
-        // Fungsi untuk inisialisasi tahun
-        function initializeTahun() {
-            const tahunSelect = document.getElementById('filter-tahun');
-            const tahunTerakhir = new Date().getFullYear();
-            for (let i = tahunTerakhir; i >= 2020; i--) {
-                const option = document.createElement('option');
-                option.value = i;
-                option.textContent = i;
-                tahunSelect.appendChild(option);
+            if (filtered.length === 0) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Tidak Ada Data',
+                    text: 'Transaksi yang cocok tidak ditemukan.',
+                });
+                return;
             }
-        }
 
-        initializeTahun();
+            y += 10;
+            doc.setFontSize(10);
+            doc.text('Tanggal      Jenis        Kategori            Jumlah', 10, y);
+            y += 5;
+            doc.line(10, y, 200, y);
 
-        // Panggil renderTransaksi saat halaman dimuat dan setiap kali filter berubah
-        renderTransaksi();
+            filtered.forEach(t => {
+                y += 7;
+                const tanggal = new Date(t.tanggal).toLocaleDateString('id-ID');
+                const baris = `${tanggal.padEnd(12)} ${t.jenis.padEnd(10)} ${t.kategori.padEnd(18)} Rp ${t.jumlah.toLocaleString('id-ID')}`;
+                if (y > 270) {
+                    doc.addPage();
+                    y = 10;
+                }
+                doc.text(baris, 10, y);
+            });
+
+            y += 10;
+            doc.text(`Total Pendapatan: ${totalPendapatanElement.textContent}`, 10, y += 7);
+            doc.text(`Total Pengeluaran: ${totalPengeluaranElement.textContent}`, 10, y += 7);
+            doc.text(`Saldo Akhir: ${saldoAkhirElement.textContent}`, 10, y += 7);
+
+            doc.save(`laporan-keuangan-${Date.now()}.pdf`);
+        });
+
+        // Event listener untuk tombol previous page
+
+
+        // Event listener untuk tombol next page
+      
     </script>
 </body>
 </html>
