@@ -8,9 +8,6 @@
     <script src="https://unpkg.com/@tailwindcss/browser@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-const OPENAI_API_KEY = "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"; // GANTI ini!
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         /* Gaya CSS Kustom (jika diperlukan) */
@@ -694,18 +691,6 @@ if (!alertSudahMuncul) {
             totalPengeluaranElement.textContent = `Rp ${totalPengeluaran.toLocaleString('id-ID')}`;
             saldoAkhirElement.textContent = `Rp ${saldoAkhir.toLocaleString('id-ID')}`;
         }
-async function tanyaChatGPT(prompt) {
-  const res = await fetch("/api/chatgpt", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt })
-  });
-
-  const data = await res.json();
-  return data.reply;
-}
-
-
 
         // Fungsi untuk mencetak laporan
         function cetakLaporan() {
@@ -907,9 +892,9 @@ async function tanyaChatGPT(prompt) {
 
 
         // Event listener untuk tombol next page
-  document.getElementById('chat-input').addEventListener('keypress', async function (e) {
+    document.getElementById('chat-input').addEventListener('keypress', function (e) {
   if (e.key === 'Enter') {
-    const input = this.value.trim();
+    const input = this.value.trim().toLowerCase();
     const log = document.getElementById('chat-log');
 
     const addToLog = (from, msg) => {
@@ -921,17 +906,57 @@ async function tanyaChatGPT(prompt) {
     addToLog('Kamu', input);
     this.value = '';
 
-    try {
-      addToLog('CADASBot 🤖', 'Mengetik...');
-      const jawaban = await tanyaChatGPT(input);
-      log.lastChild.innerHTML = `<strong>CADASBot 🤖:</strong> ${jawaban}`;
-    } catch (error) {
-      log.lastChild.innerHTML = `<strong>CADASBot 🤖:</strong> Maaf, gagal menghubungi ChatGPT 😢`;
-      console.error(error);
+    let jawaban = "Maaf, aku belum mengerti pertanyaan itu. 😅";
+
+    if (input.includes('saldo akhir')) {
+      const pendapatan = transaksi.filter(t => t.jenis === 'pendapatan').reduce((a, b) => a + b.jumlah, 0);
+      const pengeluaran = transaksi.filter(t => t.jenis === 'pengeluaran').reduce((a, b) => a + b.jumlah, 0);
+      jawaban = `Saldo akhir saat ini adalah <b>Rp ${(pendapatan - pengeluaran).toLocaleString('id-ID')}</b>`;
     }
+
+    else if (input.includes('pengeluaran bulan ini')) {
+      const now = new Date();
+      const total = transaksi.filter(t => t.jenis === 'pengeluaran' && new Date(t.tanggal).getMonth() === now.getMonth() && new Date(t.tanggal).getFullYear() === now.getFullYear())
+        .reduce((sum, t) => sum + t.jumlah, 0);
+      jawaban = `Total pengeluaran bulan ini: <b>Rp ${total.toLocaleString('id-ID')}</b>`;
+    }
+
+    else if (input.includes('pendapatan bulan ini')) {
+      const now = new Date();
+      const total = transaksi.filter(t => t.jenis === 'pendapatan' && new Date(t.tanggal).getMonth() === now.getMonth() && new Date(t.tanggal).getFullYear() === now.getFullYear())
+        .reduce((sum, t) => sum + t.jumlah, 0);
+      jawaban = `Total pendapatan bulan ini: <b>Rp ${total.toLocaleString('id-ID')}</b>`;
+    }
+
+    else if (input.includes('pengeluaran hari ini')) {
+      const today = new Date().toISOString().split('T')[0];
+      const total = transaksi.filter(t => t.jenis === 'pengeluaran' && t.tanggal === today)
+        .reduce((sum, t) => sum + t.jumlah, 0);
+      jawaban = `Total pengeluaran hari ini: <b>Rp ${total.toLocaleString('id-ID')}</b>`;
+    }
+
+    else if (input.includes('transaksi terakhir')) {
+      const terakhir = [...transaksi].sort((a, b) => b.timestamp - a.timestamp)[0];
+      if (terakhir) {
+        const tanggal = new Date(terakhir.tanggal).toLocaleDateString('id-ID');
+        jawaban = `Transaksi terakhir kamu:<br>📅 <b>${tanggal}</b><br>📂 <b>${terakhir.kategori}</b><br>💰 <b>Rp ${terakhir.jumlah.toLocaleString('id-ID')}</b>`;
+      } else {
+        jawaban = 'Belum ada transaksi yang dicatat.';
+      }
+    }
+
+    else if (input.includes('berapa kali') && input.includes('kopi')) {
+      const count = transaksi.filter(t => t.kategori.toLowerCase().includes('kopi')).length;
+      jawaban = `Kamu mencatat transaksi "kopi" sebanyak <b>${count}</b> kali. ☕`;
+    }
+
+    else if (input.includes('halo') || input.includes('hai')) {
+      jawaban = 'Halo juga! 👋 Ada yang bisa aku bantu tentang keuanganmu hari ini?';
+    }
+
+    setTimeout(() => addToLog('CADASBot 🤖', jawaban), 400);
   }
 });
-
 
     </script>
 </body>
