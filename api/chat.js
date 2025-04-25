@@ -11,7 +11,19 @@ export default async function handler(req, res) {
   });
 
   const data = await response.json();
-  const result = Array.isArray(data) ? data[0].generated_text : data.generated_text || "Maaf, belum bisa jawab 😅";
+
+  let result;
+
+  // Coba ambil dari array kalau bisa
+  if (Array.isArray(data) && data[0]?.generated_text) {
+    result = data[0].generated_text;
+  } else if (data.generated_text) {
+    result = data.generated_text;
+  } else if (typeof data === 'string') {
+    result = data;
+  } else {
+    result = "Maaf, belum bisa jawab 😅";
+  }
 
   res.status(200).json({ result });
 }
