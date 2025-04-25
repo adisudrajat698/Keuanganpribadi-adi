@@ -892,42 +892,42 @@ if (!alertSudahMuncul) {
 
 
         // Event listener untuk tombol next page
-  
+  document.getElementById('chat-input').addEventListener('keypress', async function (e) {
+  if (e.key === 'Enter') {
+    const input = this.value.trim();
+    const log = document.getElementById('chat-log');
+
+    const addToLog = (from, msg) => {
+      log.innerHTML += `<p><strong>${from}:</strong> ${msg}</p>`;
+      log.scrollTop = log.scrollHeight;
+    };
+
+    if (!input) return;
+    addToLog('Kamu', input);
+    this.value = '';
+
+    addToLog('CADASBot 🤖', '<i>Mengetik...</i>');
+
+    try {
+      const res = await fetch('/api/chatgpt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: input })
+      });
+
+      const data = await res.json();
+      const jawaban = data.reply || 'Maaf, gak ada respon dari ChatGPT 😅';
+      log.lastElementChild.innerHTML = `<strong>CADASBot 🤖:</strong> ${jawaban}`;
+    } catch (err) {
+      log.lastElementChild.innerHTML = `<strong>CADASBot 🤖:</strong> Error pas ambil jawaban 😢`;
+    }
+  }
+});
+
 
 
     </script>
 
-        <script>
-  document.getElementById('chat-input').addEventListener('keypress', async function (e) {
-    if (e.key === 'Enter') {
-      const input = this.value.trim();
-      const log = document.getElementById('chat-log');
 
-      const addToLog = (from, msg) => {
-        log.innerHTML += `<p><strong>${from}:</strong> ${msg}</p>`;
-        log.scrollTop = log.scrollHeight;
-      };
-
-      if (!input) return;
-      addToLog('Kamu', input);
-      this.value = '';
-
-      addToLog('CADASBot 🤖', '<i>Mengetik...</i>');
-
-      try {
-        const res = await fetch('/api/chatgpt', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: input })
-        });
-
-        const data = await res.json();
-        log.lastElementChild.innerHTML = `<strong>CADASBot 🤖:</strong> ${data.reply}`;
-      } catch (err) {
-        log.lastElementChild.innerHTML = `<strong>CADASBot 🤖:</strong> Maaf, ada error saat mencoba menjawab 😢`;
-      }
-    }
-  });
-</script>
 </body>
 </html>
