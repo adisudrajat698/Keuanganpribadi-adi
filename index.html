@@ -920,67 +920,78 @@ async function tanyaKeBot(pertanyaan) {
     addToLog('Kamu', input);
     this.value = '';
 
-    let jawaban = "Maaf, aku belum mengerti pertanyaan itu. 😅";
-
     if (input.includes('saldo akhir')) {
       const pendapatan = transaksi.filter(t => t.jenis === 'pendapatan').reduce((a, b) => a + b.jumlah, 0);
       const pengeluaran = transaksi.filter(t => t.jenis === 'pengeluaran').reduce((a, b) => a + b.jumlah, 0);
-      jawaban = `Saldo akhir saat ini adalah <b>Rp ${(pendapatan - pengeluaran).toLocaleString('id-ID')}</b>`;
+      const jawaban = `Saldo akhir saat ini adalah <b>Rp ${(pendapatan - pengeluaran).toLocaleString('id-ID')}</b>`;
+      setTimeout(() => addToLog('CADASBot 🤖', jawaban), 400);
+      return;
     }
 
     else if (input.includes('pengeluaran bulan ini')) {
       const now = new Date();
       const total = transaksi.filter(t => t.jenis === 'pengeluaran' && new Date(t.tanggal).getMonth() === now.getMonth() && new Date(t.tanggal).getFullYear() === now.getFullYear())
         .reduce((sum, t) => sum + t.jumlah, 0);
-      jawaban = `Total pengeluaran bulan ini: <b>Rp ${total.toLocaleString('id-ID')}</b>`;
+      const jawaban = `Total pengeluaran bulan ini: <b>Rp ${total.toLocaleString('id-ID')}</b>`;
+      setTimeout(() => addToLog('CADASBot 🤖', jawaban), 400);
+      return;
     }
 
     else if (input.includes('pendapatan bulan ini')) {
       const now = new Date();
       const total = transaksi.filter(t => t.jenis === 'pendapatan' && new Date(t.tanggal).getMonth() === now.getMonth() && new Date(t.tanggal).getFullYear() === now.getFullYear())
         .reduce((sum, t) => sum + t.jumlah, 0);
-      jawaban = `Total pendapatan bulan ini: <b>Rp ${total.toLocaleString('id-ID')}</b>`;
+      const jawaban = `Total pendapatan bulan ini: <b>Rp ${total.toLocaleString('id-ID')}</b>`;
+      setTimeout(() => addToLog('CADASBot 🤖', jawaban), 400);
+      return;
     }
 
     else if (input.includes('pengeluaran hari ini')) {
       const today = new Date().toISOString().split('T')[0];
       const total = transaksi.filter(t => t.jenis === 'pengeluaran' && t.tanggal === today)
         .reduce((sum, t) => sum + t.jumlah, 0);
-      jawaban = `Total pengeluaran hari ini: <b>Rp ${total.toLocaleString('id-ID')}</b>`;
+      const jawaban = `Total pengeluaran hari ini: <b>Rp ${total.toLocaleString('id-ID')}</b>`;
+      setTimeout(() => addToLog('CADASBot 🤖', jawaban), 400);
+      return;
     }
 
     else if (input.includes('transaksi terakhir')) {
       const terakhir = [...transaksi].sort((a, b) => b.timestamp - a.timestamp)[0];
+      let jawaban;
       if (terakhir) {
         const tanggal = new Date(terakhir.tanggal).toLocaleDateString('id-ID');
         jawaban = `Transaksi terakhir kamu:<br>📅 <b>${tanggal}</b><br>📂 <b>${terakhir.kategori}</b><br>💰 <b>Rp ${terakhir.jumlah.toLocaleString('id-ID')}</b>`;
       } else {
         jawaban = 'Belum ada transaksi yang dicatat.';
       }
+      setTimeout(() => addToLog('CADASBot 🤖', jawaban), 400);
+      return;
     }
 
     else if (input.includes('berapa kali') && input.includes('kopi')) {
       const count = transaksi.filter(t => t.kategori.toLowerCase().includes('kopi')).length;
-      jawaban = `Kamu mencatat transaksi "kopi" sebanyak <b>${count}</b> kali. ☕`;
+      const jawaban = `Kamu mencatat transaksi "kopi" sebanyak <b>${count}</b> kali. ☕`;
+      setTimeout(() => addToLog('CADASBot 🤖', jawaban), 400);
+      return;
     }
 
-   else if (input.includes('halo') || input.includes('hai')) {
-  jawaban = 'Halo juga! 👋 Ada yang bisa aku bantu tentang keuanganmu hari ini?';
-  setTimeout(() => addToLog('CADASBot 🤖', jawaban), 400);
-  return;
-}
+    else if (input.includes('halo') || input.includes('hai')) {
+      const jawaban = 'Halo juga! 👋 Ada yang bisa aku bantu tentang keuanganmu hari ini?';
+      setTimeout(() => addToLog('CADASBot 🤖', jawaban), 400);
+      return;
+    }
 
-// >>>> Bagian baru ini:
-else {
-  addToLog('CADASBot 🤖', "Sebentar ya, aku tanya ke AI dulu...");
-  tanyaKeBot(input).then(jawaban => {
-    addToLog('CADASBot 🤖', jawaban);
-  });
-  return;
-}
-
+    // 🔥 Ini buat Hugging Face
+    else {
+      addToLog('CADASBot 🤖', "Sebentar ya, aku tanya ke AI dulu...");
+      tanyaKeBot(input).then(jawaban => {
+        addToLog('CADASBot 🤖', jawaban);
+      });
+      return;
+    }
   }
 });
+
 
     </script>
 </body>
