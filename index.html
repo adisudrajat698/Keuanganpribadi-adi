@@ -950,6 +950,11 @@ if (!alertSudahMuncul) {
       jawaban = `Kamu mencatat transaksi "kopi" sebanyak <b>${count}</b> kali. ☕`;
     }
 
+         else if (input.includes('berapa kali') && input.includes('makan')) {
+      const count = transaksi.filter(t => t.kategori.toLowerCase().includes('makan')).length;
+      jawaban = `Kamu mencatat transaksi "makan" sebanyak <b>${count}</b> kali. ☕`;
+    }
+
     else if (input.includes('halo') || input.includes('hai')) {
       jawaban = 'Halo juga! 👋 Ada yang bisa aku bantu tentang keuanganmu hari ini?';
     }
