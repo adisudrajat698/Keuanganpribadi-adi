@@ -1,5 +1,4 @@
-// File: /api/chatgpt.js
-
+// /api/chatgpt.js
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -8,7 +7,7 @@ export default async function handler(req, res) {
   const { message } = req.body;
 
   try {
-    const openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
@@ -20,12 +19,12 @@ export default async function handler(req, res) {
       }),
     });
 
-    const data = await openaiRes.json();
-    const reply = data.choices[0]?.message?.content || "Maaf, aku nggak ngerti maksudmu 😅";
-
+    const data = await response.json();
+    
+    const reply = data.choices?.[0]?.message?.content || "Gak ada respon dari ChatGPT 😅";
     res.status(200).json({ reply });
   } catch (error) {
-    console.error("OpenAI error:", error);
-    res.status(500).json({ error: "Gagal mengambil respon dari ChatGPT." });
+    console.error("Error:", error);
+    res.status(500).json({ error: "Gagal mengambil jawaban dari ChatGPT." });
   }
 }
