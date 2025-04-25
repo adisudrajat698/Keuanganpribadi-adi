@@ -694,23 +694,17 @@ if (!alertSudahMuncul) {
             totalPengeluaranElement.textContent = `Rp ${totalPengeluaran.toLocaleString('id-ID')}`;
             saldoAkhirElement.textContent = `Rp ${saldoAkhir.toLocaleString('id-ID')}`;
         }
-
-        async function tanyaChatGPT(pertanyaan) {
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+async function tanyaChatGPT(prompt) {
+  const res = await fetch("/api/chatgpt", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${OPENAI_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: pertanyaan }]
-    })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt })
   });
 
-  const data = await response.json();
-  return data.choices[0].message.content.trim();
+  const data = await res.json();
+  return data.reply;
 }
+
 
 
         // Fungsi untuk mencetak laporan
