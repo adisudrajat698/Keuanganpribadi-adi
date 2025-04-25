@@ -147,6 +147,10 @@
             border-color: #ddd;
         }
 
+        #chat-log p {
+  margin-bottom: 8px;
+}
+
     </style>
 </head>
 <body class="bg-gray-100 font-inter">
@@ -336,6 +340,12 @@
                     <p id="saldo-akhir" class="text-xl font-bold text-blue-600">Rp 0</p>
                 </div>
             </div>
+
+            <div id="section-chatbot" class="bg-white rounded-lg p-6 mb-8 shadow-md">
+  <h2 class="text-2xl font-semibold text-gray-800 mb-4"><i class="fas fa-robot mr-2"></i> CADASBot</h2>
+  <div id="chat-log" class="bg-gray-100 rounded p-4 h-60 overflow-y-auto mb-4 text-sm"></div>
+  <input type="text" id="chat-input" placeholder="Tanya sesuatu seperti: 'pengeluaran bulan ini'" class="w-full p-2 border rounded shadow focus:outline-none focus:ring" />
+</div>
             <p class="mt-4 text-gray-600 text-sm">
                 <i class="fas fa-chart-line mr-1"></i>
                 <b>Motivasi:</b> "Ringkasan ini membantu Anda melihat gambaran besar keuangan Anda."
@@ -882,7 +892,54 @@ if (!alertSudahMuncul) {
 
 
         // Event listener untuk tombol next page
-      
+      // === Chatbot Logic Start ===
+document.getElementById('chat-input').addEventListener('keypress', function (e) {
+  if (e.key === 'Enter') {
+    const input = this.value.trim().toLowerCase();
+    const log = document.getElementById('chat-log');
+
+    const addToLog = (from, msg) => {
+      log.innerHTML += `<p><strong>${from}:</strong> ${msg}</p>`;
+      log.scrollTop = log.scrollHeight;
+    };
+
+    if (!input) return;
+    addToLog('Kamu', input);
+    this.value = '';
+
+    let jawaban = "Maaf, aku belum mengerti pertanyaan itu. 😅";
+
+    if (input.includes('pengeluaran bulan ini')) {
+      const now = new Date();
+      const total = transaksi.filter(t => t.jenis === 'pengeluaran' && new Date(t.tanggal).getMonth() === now.getMonth() && new Date(t.tanggal).getFullYear() === now.getFullYear())
+        .reduce((sum, t) => sum + t.jumlah, 0);
+      jawaban = `Total pengeluaran bulan ini: <b>Rp ${total.toLocaleString('id-ID')}</b>`;
+    }
+
+    else if (input.includes('saldo akhir')) {
+      const pendapatan = transaksi.filter(t => t.jenis === 'pendapatan').reduce((a, b) => a + b.jumlah, 0);
+      const pengeluaran = transaksi.filter(t => t.jenis === 'pengeluaran').reduce((a, b) => a + b.jumlah, 0);
+      jawaban = `Saldo akhir saat ini adalah <b>Rp ${(pendapatan - pengeluaran).toLocaleString('id-ID')}</b>`;
+    }
+
+    else if (input.includes('pengeluaran terbesar')) {
+      const terbesar = transaksi.filter(t => t.jenis === 'pengeluaran').sort((a, b) => b.jumlah - a.jumlah)[0];
+      if (terbesar) {
+        jawaban = `Pengeluaran terbesar kamu adalah <b>Rp ${terbesar.jumlah.toLocaleString('id-ID')}</b> untuk <i>${terbesar.kategori}</i>.`;
+      } else {
+        jawaban = 'Belum ada pengeluaran yang tercatat.';
+      }
+    }
+
+    else if (input.includes('halo') || input.includes('hai')) {
+      jawaban = 'Halo juga! 👋 Ada yang bisa aku bantu tentang keuanganmu hari ini?';
+    }
+
+    setTimeout(() => addToLog('CADASBot 🤖', jawaban), 400);
+  }
+});
+// === Chatbot Logic End ===
+
     </script>
 </body>
 </html>
