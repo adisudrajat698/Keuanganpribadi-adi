@@ -890,7 +890,21 @@ if (!alertSudahMuncul) {
 
         // Event listener untuk tombol previous page
 
+async function tanyaKeBot(pertanyaan) {
+  const res = await fetch('/api/chat', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ input: pertanyaan })
+  });
 
+  const data = await res.json();
+  return data.result;
+}
+
+
+        
         // Event listener untuk tombol next page
     document.getElementById('chat-input').addEventListener('keypress', function (e) {
   if (e.key === 'Enter') {
@@ -950,11 +964,21 @@ if (!alertSudahMuncul) {
       jawaban = `Kamu mencatat transaksi "kopi" sebanyak <b>${count}</b> kali. ☕`;
     }
 
-    else if (input.includes('halo') || input.includes('hai')) {
-      jawaban = 'Halo juga! 👋 Ada yang bisa aku bantu tentang keuanganmu hari ini?';
-    }
+   else if (input.includes('halo') || input.includes('hai')) {
+  jawaban = 'Halo juga! 👋 Ada yang bisa aku bantu tentang keuanganmu hari ini?';
+  setTimeout(() => addToLog('CADASBot 🤖', jawaban), 400);
+  return;
+}
 
-    setTimeout(() => addToLog('CADASBot 🤖', jawaban), 400);
+// >>>> Bagian baru ini:
+else {
+  addToLog('CADASBot 🤖', "Sebentar ya, aku tanya ke AI dulu...");
+  tanyaKeBot(input).then(jawaban => {
+    addToLog('CADASBot 🤖', jawaban);
+  });
+  return;
+}
+
   }
 });
 
