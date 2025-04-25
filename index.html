@@ -953,17 +953,8 @@ if (!alertSudahMuncul) {
     else if (input.includes('halo') || input.includes('hai')) {
       jawaban = 'Halo juga! 👋 Ada yang bisa aku bantu tentang keuanganmu hari ini?';
     }
-setTimeout(() => {
-  addToLog('CADASBot 🤖', jawaban);
 
-  // === Text to Speech ===
-  const suara = new SpeechSynthesisUtterance(
-    jawaban.replace(/<[^>]*>?/gm, '') // hapus tag HTML
-  );
-  suara.lang = 'id-ID'; // bahasa Indonesia
-  window.speechSynthesis.speak(suara);
-}, 400);
-      
+    setTimeout(() => addToLog('CADASBot 🤖', jawaban), 400);
   }
 });
 
