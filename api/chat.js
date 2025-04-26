@@ -2,20 +2,21 @@ export default async function handler(req, res) {
   const input = req.body.input;
 
   try {
-    const response = await fetch('https://api-inference.huggingface.co/models/google/flan-t5-small', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.HF_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        inputs: input,
-        parameters: {
-          max_new_tokens: 100,
-          temperature: 0.7
-        }
-      })
-    });
+   const response = await fetch('https://api-inference.huggingface.co/models/t5-base', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${process.env.HF_API_KEY}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    inputs: input,
+    parameters: {
+      max_new_tokens: 150,
+      temperature: 0.7
+    }
+  })
+});
+
 
     const data = await response.json();
 
