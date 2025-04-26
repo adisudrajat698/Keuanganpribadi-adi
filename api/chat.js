@@ -1,37 +1,32 @@
 export default async function handler(req, res) {
-  const userInput = req.body.input;
-
-  // Buat prompt supaya AI ngerti dia asisten keuangan
-  const prompt = `Sebagai asisten keuangan pribadi, jawablah pertanyaan berikut dengan jelas, sopan, dan profesional:\n\n${userInput}`;
+  const input = req.body.input;
 
   try {
-    const response = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1', {
+    const response = await fetch('https://api-inference.huggingface.co/models/google/flan-t5-small', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.HF_API_KEY}`, // API Key Hugging Face kamu
+        'Authorization': `Bearer ${process.env.HF_API_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        inputs: prompt,
+        inputs: input,
         parameters: {
-          max_new_tokens: 150,      // Jawaban maksimal 150 token
-          temperature: 0.4,         // Biar serius dan gak ngawur
-          repetition_penalty: 1.2   // Biar gak ngulang-ngulang kata
+          max_new_tokens: 100,
+          temperature: 0.7
         }
       })
     });
 
     const data = await response.json();
 
-    let result = "Maaf, belum bisa jawab 😅"; // Default jawaban kalau error
+    let result = "Maaf, belum bisa jawab 😅";
 
-    // Cek tipe data hasil jawaban
     if (Array.isArray(data) && data[0]?.generated_text) {
-      result = data[0].generated_text.trim();
+      result = data[0].generated_text;
     } else if (typeof data === 'object' && data.generated_text) {
-      result = data.generated_text.trim();
+      result = data.generated_text;
     } else if (typeof data === 'string') {
-      result = data.trim();
+      result = data;
     } else if (data.error) {
       result = `❌ Error dari AI: ${data.error}`;
     }
