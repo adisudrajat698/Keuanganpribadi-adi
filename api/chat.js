@@ -9,11 +9,10 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        inputs: "User: kamu lagi apa? \nBot:",
+        inputs: input,
         parameters: {
-          temperature: 0.5,
-          top_p: 0.8,
-          max_length: 100
+          max_new_tokens: 100,
+          temperature: 0.7
         }
       })
     });
