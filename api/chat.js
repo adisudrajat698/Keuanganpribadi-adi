@@ -1,20 +1,15 @@
-// api/chat.js
-
-let chatHistory = [];
-
 export default async function handler(req, res) {
   const userInput = req.body.input;
 
-  // Batas jumlah history biar gak terlalu panjang
-  if (chatHistory.length > 10) {
-    chatHistory.shift();
-  }
+  const prompt = `
+Kamu adalah chatbot santai bernama CADASBot 🤖. 
+Tugasmu adalah menjawab pertanyaan user dengan gaya santai, kadang bercanda sedikit, tapi tetap sopan dan to the point.
+Kalau ada pertanyaan aneh, jawab aja dengan lucu tapi jangan ngaco.
+Jawaban maksimal 3 kalimat.
 
-  // Tambahkan input user ke history
-  chatHistory.push(`User: ${userInput}`);
-
-  // Gabungkan history untuk dijadikan prompt
-  const prompt = `Kamu adalah chatbot yang santai, suka bercanda dikit, tapi tetap sopan. Jawab dengan gaya ringan.\n\n${chatHistory.join("\n")}\nBot:`;
+Pertanyaan: ${userInput}
+Jawaban:
+`;
 
   try {
     const response = await fetch('https://api-inference.huggingface.co/models/google/flan-t5-small', {
@@ -37,17 +32,14 @@ export default async function handler(req, res) {
     let result = "Maaf, aku lagi bengong 🤣";
 
     if (Array.isArray(data) && data[0]?.generated_text) {
-      result = data[0].generated_text.replace(/.*Bot:/s, '').trim();
+      result = data[0].generated_text.split('Jawaban:')[1]?.trim() || result;
     } else if (typeof data === 'object' && data.generated_text) {
-      result = data.generated_text.replace(/.*Bot:/s, '').trim();
+      result = data.generated_text.split('Jawaban:')[1]?.trim() || result;
     } else if (typeof data === 'string') {
       result = data;
     } else if (data.error) {
       result = `❌ Error dari AI: ${data.error}`;
     }
-
-    // Tambahkan respon bot ke history
-    chatHistory.push(`Bot: ${result}`);
 
     res.status(200).json({ result });
   } catch (error) {
