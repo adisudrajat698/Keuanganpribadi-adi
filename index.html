@@ -889,19 +889,23 @@ if (!alertSudahMuncul) {
         });
 
         // Event listener untuk tombol previous page
-
 async function tanyaKeBot(pertanyaan) {
-  const res = await fetch('/api/chat', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ input: pertanyaan })
-  });
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ input: pertanyaan })
+    });
 
-  const data = await res.json();
-  return data.result;
+    const data = await res.json();
+    return data.result;
+  } catch (error) {
+    return `❌ Terjadi kesalahan: ${error.message}`;
+  }
 }
+
 
 
         
