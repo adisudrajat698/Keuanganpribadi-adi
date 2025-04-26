@@ -1,15 +1,5 @@
 export default async function handler(req, res) {
-  const userInput = req.body.input;
-
-  const prompt = `
-Kamu adalah chatbot santai bernama CADASBot 🤖. 
-Tugasmu adalah menjawab pertanyaan user dengan gaya santai, kadang bercanda sedikit, tapi tetap sopan dan to the point.
-Kalau ada pertanyaan aneh, jawab aja dengan lucu tapi jangan ngaco.
-Jawaban maksimal 3 kalimat.
-
-Pertanyaan: ${userInput}
-Jawaban:
-`;
+  const input = req.body.input;
 
   try {
     const response = await fetch('https://api-inference.huggingface.co/models/google/flan-t5-small', {
@@ -19,22 +9,22 @@ Jawaban:
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        inputs: prompt,
+        inputs: input,
         parameters: {
-          max_new_tokens: 150,
-          temperature: 0.3
+          max_new_tokens: 100,
+          temperature: 0.7
         }
       })
     });
 
     const data = await response.json();
 
-    let result = "Maaf, aku lagi bengong 🤣";
+    let result = "Maaf, belum bisa jawab 😅";
 
     if (Array.isArray(data) && data[0]?.generated_text) {
-      result = data[0].generated_text.split('Jawaban:')[1]?.trim() || result;
+      result = data[0].generated_text;
     } else if (typeof data === 'object' && data.generated_text) {
-      result = data.generated_text.split('Jawaban:')[1]?.trim() || result;
+      result = data.generated_text;
     } else if (typeof data === 'string') {
       result = data;
     } else if (data.error) {
