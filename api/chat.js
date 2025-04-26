@@ -2,7 +2,7 @@ export default async function handler(req, res) {
   const input = req.body.input;
 
   try {
-    const response = await fetch('https://api-inference.huggingface.co/models/gpt2', {
+    const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${process.env.HF_API_KEY}`,
