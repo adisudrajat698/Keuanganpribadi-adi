@@ -699,7 +699,7 @@ if (!alertSudahMuncul) {
                         <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="font-italic text-gray-800">${tanggalFormatted}</span></td>
                         <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="font-semibold ${transaksi.jenis === 'pendapatan' ? 'transaksi-positif': 'transaksi-negatif'}">${transaksi.jenis}</span></td>
                         <td class="px-5 py-5 border-b border-gray-200 text-sm"><span class="font-oblique font-sans text-purple-600">${transaksi.kategori}</span></td>
-                        <td class="px-5 py-5 border-b border-gray-200 text-sm text-right">Rp ${transaksi.jumlah.toLocaleString('id-ID')}</td>
+                       <td class="px-5 py-5 border-b border-gray-200 text-sm text-right text-blue-600">Rp ${transaksi.jumlah.toLocaleString('id-ID')}</td>
                         <td class="px-5 py-5 border-b border-gray-200 text-sm">
                             <button class="lihat-detail bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline text-xs" data-id="${transaksi.id}">
                                 <i class="fas fa-info-circle"></i> Detail
