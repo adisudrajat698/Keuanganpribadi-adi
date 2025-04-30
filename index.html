@@ -149,18 +149,6 @@
             border-color: #ddd;
         }
 
-        body.dark-mode {
-    background-color: #121212;
-    color: #ffffff;
-  }
-  body.dark-mode a {
-    color: #bb86fc;
-  }
-  body.dark-mode button {
-    background-color: #333;
-    color: #fff;
-  }
-
         #chat-log p {
   margin-bottom: 8px;
 }
@@ -215,7 +203,6 @@
 
 
 
-<button id="darkModeToggle" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">🌓 Mode Gelap</button>
 
 
 
@@ -1020,16 +1007,6 @@ async function tanyaKeBot(pertanyaan) {
   }
 });
 
-          const toggle = document.getElementById('darkModeToggle');
-  toggle.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    // Optional: Ganti teks tombol
-    if (document.body.classList.contains('dark-mode')) {
-      toggle.innerText = '☀️ Mode Terang';
-    } else {
-      toggle.innerText = '🌓 Mode Gelap';
-    }
-  });
 
     </script>
 </body>
