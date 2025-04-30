@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -201,6 +201,10 @@
 
 
 
+<button id="darkModeToggle" style="position: absolute; top: 1rem; right: 1rem; z-index: 9999;"
+    class="bg-gray-200 dark:bg-gray-800 text-black dark:text-white px-4 py-2 rounded">
+    🌙 Dark Mode
+</button>
 
 
 
@@ -1006,6 +1010,26 @@ async function tanyaKeBot(pertanyaan) {
     }
   }
 });
+
+        
+  const toggle = document.getElementById('darkModeToggle');
+  const root = document.documentElement;
+
+  // Baca preferensi dari localStorage
+  if (localStorage.getItem('theme') === 'dark') {
+      root.classList.add('dark');
+  }
+
+  toggle.addEventListener('click', () => {
+      if (root.classList.contains('dark')) {
+          root.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+      } else {
+          root.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+      }
+  });
+
 
 
     </script>
