@@ -494,7 +494,9 @@ body.dark table {
                 loginSection.style.display = 'none';
                 logoutSection.style.display = 'block';
                 saldoSection.style.display = 'block';
-                tambahTransaksiSection.style.display = 'block';
+               tambahTransaksiSection.style.display = 'none'; // ⬅ form tetap disembunyikan
+document.getElementById('tambah-transaksi-toggle-wrapper').style.display = 'block'; // ⬅ tombol toggle muncul
+
                 filterTransaksiSection.style.display = 'block';
                 daftarTransaksiTable.parentElement.parentElement.style.display = 'block';
                 summarySection.style.display = 'block';
