@@ -9,6 +9,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+   <!-- FullCalendar -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
     <style>
         /* Gaya CSS Kustom (jika diperlukan) */
         .transaksi-positif {
@@ -234,6 +237,11 @@ body.dark table {
                 <b>Motivasi:</b> "Setiap pengeluaran yang dicatat adalah langkah menuju kebebasan finansial."
             </p>
 
+            
+<button onclick="tampilkanKalender()" class="bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded mt-4">
+  📆 Lihat Kalender Transaksi
+</button>
+
 
 
 
@@ -433,6 +441,12 @@ body.dark table {
             </p>
         </div>
     </div>
+<div id="section-kalender" class="bg-white rounded-lg p-6 mb-8" style="display: none;">
+  <h2 class="text-2xl font-semibold text-pink-700 mb-4"><i class="fas fa-calendar-alt mr-2"></i> Kalender Transaksi</h2>
+  <div id="calendar"></div>
+</div>
+
+        
  <footer class="copyright">
         &copy; 2024 Adi Sudrajat. All rights reserved.
     </footer>
@@ -1126,6 +1140,50 @@ document.getElementById('chat-send').addEventListener('click', function () {
   });
   inputField.dispatchEvent(event);
 });
+
+        let kalenderInisialisasi = false;
+
+function tampilkanKalender() {
+  document.getElementById('section-kalender').style.display = 'block';
+
+  const calendarEl = document.getElementById('calendar');
+  if (!kalenderInisialisasi) {
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      height: 500,
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: ''
+      },
+      events: transaksi.map(t => {
+        return {
+          title: `${t.jenis === 'pendapatan' ? '+' : '-'} Rp ${t.jumlah.toLocaleString('id-ID')} (${t.kategori})`,
+          date: t.tanggal,
+          color: t.jenis === 'pendapatan' ? '#16a34a' : '#dc2626'
+        };
+      }),
+      dateClick: function(info) {
+        const tanggal = info.dateStr;
+        const transaksiHariIni = transaksi.filter(t => t.tanggal === tanggal);
+        if (transaksiHariIni.length > 0) {
+          let isi = transaksiHariIni.map(t => {
+            return `• <b>${t.kategori}</b> (${t.jenis}) - Rp ${t.jumlah.toLocaleString('id-ID')}`;
+          }).join('<br>');
+          Swal.fire({
+            title: `Transaksi ${tanggal}`,
+            html: isi,
+            icon: 'info'
+          });
+        } else {
+          Swal.fire('Tidak ada transaksi pada hari ini.', '', 'info');
+        }
+      }
+    });
+    calendar.render();
+    kalenderInisialisasi = true;
+  }
+}
 
     </script>
 </body>
