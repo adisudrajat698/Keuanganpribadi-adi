@@ -338,6 +338,13 @@ body.dark table {
             </p>
         </div>
 
+        <div class="text-right mb-4" style="display: none;" id="toggle-daftar-transaksi-wrapper">
+  <button onclick="toggleDaftarTransaksi()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+    📋 Lihat Daftar Transaksi
+  </button>
+</div>
+
+        
         <div id="section-daftar-transaksi" class="bg-white rounded-lg p-6 mb-8" style="display: none;">
             <h2 class="text-2xl font-semibold text-green-700 mb-4"><i class="fas fa-list-ul mr-2"></i> Daftar Transaksi</h2>
             <div class="overflow-x-auto">
@@ -498,7 +505,9 @@ body.dark table {
 document.getElementById('tambah-transaksi-toggle-wrapper').style.display = 'block'; // ⬅ tombol toggle muncul
 
                 filterTransaksiSection.style.display = 'block';
-                daftarTransaksiTable.parentElement.parentElement.style.display = 'block';
+                daftarTransaksiTable.parentElement.parentElement.style.display = 'none';
+document.getElementById('toggle-daftar-transaksi-wrapper').style.display = 'block';
+
                 summarySection.style.display = 'block';
                 cetPdfButton.parentElement.style.display = 'block';
                 prevPageButton.parentElement.style.display = 'flex'; //memastikan tombol navigasi selalu flex
@@ -514,6 +523,8 @@ document.getElementById('tambah-transaksi-toggle-wrapper').style.display = 'bloc
                 cetPdfButton.parentElement.style.display = 'none';
                 prevPageButton.parentElement.style.display = 'none';
                 document.getElementById('tambah-transaksi-toggle-wrapper').style.display = 'none';
+                document.getElementById('toggle-daftar-transaksi-wrapper').style.display = 'none';
+
             }
         }
 
@@ -1135,6 +1146,11 @@ document.getElementById('chat-send').addEventListener('click', function () {
 
         function toggleFormTambahTransaksi() {
   const section = document.getElementById('section-tambah-transaksi');
+  section.style.display = section.style.display === 'none' ? 'block' : 'none';
+}
+
+        function toggleDaftarTransaksi() {
+  const section = document.getElementById('section-daftar-transaksi');
   section.style.display = section.style.display === 'none' ? 'block' : 'none';
 }
 
