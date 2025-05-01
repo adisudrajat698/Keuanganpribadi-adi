@@ -337,43 +337,52 @@ body.dark table {
                 <b>Pengingat:</b> Gunakan filter untuk melihat riwayat transaksi Anda dengan lebih mudah.
             </p>
         </div>
+<!-- Bagian: Judul Daftar Transaksi -->
+<div id="section-daftar-transaksi" class="bg-white rounded-lg p-6 mb-8" style="display: block;">
+  <h2 class="text-2xl font-semibold text-green-700 mb-4">
+    <i class="fas fa-list-ul mr-2"></i> Daftar Transaksi
+  </h2>
+</div>
 
-        <div id="section-daftar-transaksi" class="bg-white rounded-lg p-6 mb-8" style="display: none;">
-            <h2 class="text-2xl font-semibold text-green-700 mb-4"><i class="fas fa-list-ul mr-2"></i> Daftar Transaksi</h2>
-            <div class="text-right mb-4">
+<!-- Tombol toggle -->
+<div class="text-right mb-4">
   <button onclick="toggleDaftarTransaksi()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
     📋 Lihat/Sembunyikan Daftar Transaksi
   </button>
 </div>
-           <div id="tabel-transaksi-wrapper" style="display: none;">
+
+<!-- Tabel transaksi yang bisa di-toggle -->
+<div id="tabel-transaksi-wrapper" style="display: none;" class="bg-white rounded-lg p-6 mb-8">
   <div class="overflow-x-auto">
-    <table id="daftar-transaksi" class="min-w-full ...">
-                    <thead class="bg-gray-200 text-gray-700">
-                        <tr>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Tanggal</th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Jenis</th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Kategori</th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 text-right text-xs font-semibold uppercase tracking-wider">Jumlah</th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white">
-                        <tr>
-                            <td colspan="5" class="px-5 py-5 border-b border-gray-200 text-sm">Tidak ada transaksi.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="pagination">
+    <table id="daftar-transaksi" class="min-w-full leading-normal shadow-md rounded-lg overflow-hidden">
+      <thead class="bg-gray-200 text-gray-700">
+        <tr>
+          <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Tanggal</th>
+          <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Jenis</th>
+          <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Kategori</th>
+          <th class="px-5 py-3 border-b-2 border-gray-200 text-right text-xs font-semibold uppercase tracking-wider">Jumlah</th>
+          <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Aksi</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white">
+        <tr>
+          <td colspan="5" class="px-5 py-5 border-b border-gray-200 text-sm">Tidak ada transaksi.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination">
     <button id="prev-page" disabled>Previous</button>
     <button id="next-page">Next</button>
+  </div>
+
+  <p class="mt-4 text-gray-600 text-sm">
+    <i class="fas fa-history mr-1"></i>
+    <b>Motivasi:</b> "Setiap transaksi adalah bagian dari cerita keuangan Anda. Catat dengan baik!"
+  </p>
 </div>
 
-
-            <p class="mt-4 text-gray-600 text-sm">
-                <i class="fas fa-history mr-1"></i>
-                <b>Motivasi:</b> "Setiap transaksi adalah bagian dari cerita keuangan Anda. Catat dengan baik!"
-            </p>
 
         <div id="section-summary" class="bg-white rounded-lg p-6 mb-8" style="display: none;">
             <h2 class="text-2xl font-semibold text-red-700 mb-4"><i class="fas fa-chart-pie mr-2"></i> Ringkasan</h2>
@@ -1148,6 +1157,8 @@ document.getElementById('chat-send').addEventListener('click', function () {
   const wrapper = document.getElementById('tabel-transaksi-wrapper');
   wrapper.style.display = wrapper.style.display === 'none' ? 'block' : 'none';
 }
+
+
 
     </script>
 </body>
