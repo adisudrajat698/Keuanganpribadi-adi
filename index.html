@@ -1174,27 +1174,6 @@ function setActiveLink(link) {
     // Menambahkan class 'active' pada link yang diklik
     link.classList.add('active');
   }
-
-
-          const sections = document.querySelectorAll("section[id]");
-  const navLinks = document.querySelectorAll("#navbar-links a");
-
-  window.addEventListener("scroll", () => {
-    let current = "";
-
-    sections.forEach((section) => {
-      const sectionTop = section.offsetTop - 100; // offset buat header
-      if (window.scrollY >= sectionTop) {
-        current = section.getAttribute("id");
-      }
-    });
-
-    navLinks.forEach((link) => {
-      link.classList.remove("active");
-      if (link.getAttribute("href") === `#${current}`) {
-        link.classList.add("active");
-      }
-    });
     </script>
 </body>
 </html>
