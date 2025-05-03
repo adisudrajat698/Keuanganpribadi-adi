@@ -191,6 +191,10 @@ body.dark table {
  html {
     scroll-behavior: smooth;
   }
+        a.active {
+  text-decoration: underline;
+  color: #FFD700; /* Misalnya ganti warna menjadi emas */
+}
     </style>
 </head>
 <body class="bg-gray-100 font-inter">
@@ -200,18 +204,18 @@ body.dark table {
     <button class="md:hidden block text-white" onclick="document.getElementById('navbar-links').classList.toggle('hidden')">
       ☰
     </button>
-    <div id="navbar-links" class="w-full md:flex md:items-center md:w-auto hidden md:block mt-4 md:mt-0 space-y-2 md:space-y-0 md:space-x-6">
-      <a href="#section-saldo" class="block md:inline hover:underline">Saldo</a>
-      <a href="#section-tambah-transaksi" class="block md:inline hover:underline">Tambah</a>
-      <a href="#section-filter-transaksi" class="block md:inline hover:underline">Filter</a>
-      <a href="#section-daftar-transaksi" class="block md:inline hover:underline">Transaksi</a>
-      <a href="#section-summary" class="block md:inline hover:underline">Ringkasan</a>
-      <a href="#kalkulator-tabungan" class="block md:inline hover:underline">Kalkulator</a>
-        <a href="#section-chatbot" class="block md:inline hover:underline">Cadas Bot</a>
-          <button id="toggle-dark-mode" class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 transition">
-    🌙 Dark Mode
-  </button>
 
+    <div id="navbar-links" class="w-full md:flex md:items-center md:w-auto hidden md:block mt-4 md:mt-0 space-y-2 md:space-y-0 md:space-x-6">
+      <a href="#section-saldo" class="block md:inline hover:underline" onclick="setActiveLink(this)">Saldo</a>
+      <a href="#section-tambah-transaksi" class="block md:inline hover:underline" onclick="setActiveLink(this)">Tambah</a>
+      <a href="#section-filter-transaksi" class="block md:inline hover:underline" onclick="setActiveLink(this)">Filter</a>
+      <a href="#section-daftar-transaksi" class="block md:inline hover:underline" onclick="setActiveLink(this)">Transaksi</a>
+      <a href="#section-summary" class="block md:inline hover:underline" onclick="setActiveLink(this)">Ringkasan</a>
+      <a href="#kalkulator-tabungan" class="block md:inline hover:underline" onclick="setActiveLink(this)">Kalkulator</a>
+      <a href="#section-chatbot" class="block md:inline hover:underline" onclick="setActiveLink(this)">Cadas Bot</a>
+      <button id="toggle-dark-mode" class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 transition">
+        🌙 Dark Mode
+      </button>
     </div>
   </div>
 </nav>
@@ -1156,7 +1160,16 @@ document.getElementById('chat-send').addEventListener('click', function () {
   const section = document.getElementById('section-tambah-transaksi');
   section.style.display = section.style.display === 'none' ? 'block' : 'none';
 }
+function setActiveLink(link) {
+    // Menghapus class 'active' dari semua link
+    const links = document.querySelectorAll('#navbar-links a');
+    links.forEach(link => {
+      link.classList.remove('active');
+    });
 
+    // Menambahkan class 'active' pada link yang diklik
+    link.classList.add('active');
+  }
     </script>
 </body>
 </html>
